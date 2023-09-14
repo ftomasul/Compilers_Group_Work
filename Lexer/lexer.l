@@ -5,8 +5,9 @@ using namespace std;
 
 %%
 
-[a-z] { cout << "Lowercase" << endl; }
-. { cout << "Not a lowercase" << endl; }
+do { cout << "K-DO" << endl; }
+double { cout << "K-DOUBLE" << endl;}
+. { cout << "No match" << endl; }
 \n { return 0; }
 
 %%
