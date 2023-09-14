@@ -1,21 +1,23 @@
 %{
-
-
+#include <iostream>
+using namespace std;
 %}
 
 %%
 
-[a-z] {printf("Lowercase \n");}
-. {printf("Not a lowercase \n");}
-\n {return 0;}
+[a-z] { cout << "Lowercase" << endl; }
+. { cout << "Not a lowercase" << endl; }
+\n { return 0; }
 
 %%
 
-yywrap() {}
-
 int main() {
-    printf("Enter test: ");
+    cout << "Enter test: ";
     yylex();
 
     return 0;
+}
+
+int yywrap() {
+    return 1;
 }

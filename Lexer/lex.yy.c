@@ -438,8 +438,8 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lexer.l"
 #line 2 "lexer.l"
-
-
+#include <iostream>
+using namespace std;
 #line 444 "lex.yy.c"
 #line 445 "lex.yy.c"
 
@@ -721,18 +721,18 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 8 "lexer.l"
-{printf("Lowercase");}
+{ cout << "Lowercase" << endl; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 9 "lexer.l"
-{printf("Not a lowercase\n");}
+{ cout << "Not a lowercase" << endl; }
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
 #line 10 "lexer.l"
-{return 0;}
+{ return 0; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
@@ -1747,11 +1747,13 @@ void yyfree (void * ptr )
 #line 12 "lexer.l"
 
 
-yywrap() {}
-
 int main() {
-    printf("Enter test: ");
+    cout << "Enter test: ";
     yylex();
 
     return 0;
+}
+
+int yywrap() {
+    return 1;
 }
