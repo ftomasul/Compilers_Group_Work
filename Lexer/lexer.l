@@ -17,7 +17,6 @@ double { cout << "K-DOUBLE" << endl; }
 
 int main() {
 
-    
     while(1) {
         cout << "Enter test: ";
         yylex();
