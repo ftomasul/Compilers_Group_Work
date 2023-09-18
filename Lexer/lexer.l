@@ -27,7 +27,7 @@ string { cout << "K_STRING" << endl; }
 then { cout << "K_THEN" << endl; }
 while { cout << "K_WHILE" << endl; }
 -?[0-9]+ { cout << "ICONSTANT" << endl; }
--?([0-9]+([.][0-9]*)?|[.][0-9]+)|([0-9]+([.][0-9]*)?|[.][0-9]+[dD]+[+-]?[0-9]+) { cout << "DCONSTANT" << endl; } 
+-?([0-9]+([.][0-9]*)?|[.][0-9]+|[0-9]+([.][0-9]*)?[dD][+-]?[0-9]+) { cout << "DCONSTANT" << endl; } 
 := { cout << "ASSIGN" << endl; }
 \+= { cout << "ASSIGN_PLUS" << endl; }
 -= { cout << "ASSIGN_MINUS" << endl; }
@@ -35,10 +35,11 @@ while { cout << "K_WHILE" << endl; }
 \/= { cout << "ASSIGN_DIVIDE" << endl; }
 %= { cout << "ASSIGN_MOD" << endl; }
 , { cout << "COMMA" << endl; }
+\/\/ {cout << "COMMENT" << endl; }
 && { cout << "DAND" << endl; }
 \/ { cout << "DIVIDE" << endl; }
 \|\| { cout << "DOR" << endl; }
-== { cout << "DEQUAL" << endl; }
+== { cout << "DEQ" << endl; }
 >= { cout << "GEQ" << endl; }
 > { cout << "GT" << endl; }
 \[ { cout << "LBRACKET" << endl; }
