@@ -6,7 +6,7 @@ using namespace std;
 
 %%
 
-[ \t\n\f\r]+ { /* Ignore whitespace */ }
+[ \t\n\f\r]+ { /* Whitespace: ignore */ }
 do { cout << "K-DO" << endl; }
 double { cout << "K-DOUBLE" << endl; }
 else { cout << "K_ELSE" << endl; }
@@ -26,8 +26,8 @@ return { cout << "K_RETURN" << endl; }
 string { cout << "K_STRING" << endl; }
 then { cout << "K_THEN" << endl; }
 while { cout << "K_WHILE" << endl; }
-[0-9]+ { cout << "ICONSTANT" << endl; }
--?([0-9]*[.])?[0-9]+[dD]?[-+]?[0-9]+ { cout << "DCONSTANT" << endl; }
+-?[0-9]+ { cout << "ICONSTANT" << endl; }
+-?([0-9]+([.][0-9]*)?|[.][0-9]+)|([0-9]+([.][0-9]*)?|[.][0-9]+[dD]+[+-]?[0-9]+) { cout << "DCONSTANT" << endl; } 
 := { cout << "ASSIGN" << endl; }
 \+= { cout << "ASSIGN_PLUS" << endl; }
 -= { cout << "ASSIGN_MINUS" << endl; }
@@ -68,6 +68,7 @@ while { cout << "K_WHILE" << endl; }
 int main(int argc, char* argv[]) {
     if(argc == 2) {
         cout << "Lex " << argv[1] << endl;
+        cout << endl;
 
         const char* filename = argv[1];
         FILE* file = fopen(filename, "r");
