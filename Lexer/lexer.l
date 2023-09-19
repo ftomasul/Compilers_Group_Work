@@ -35,7 +35,7 @@ while { cout << "K_WHILE" << endl; }
 \/= { cout << "ASSIGN_DIVIDE" << endl; }
 %= { cout << "ASSIGN_MOD" << endl; }
 , { cout << "COMMA" << endl; }
-\/\/ {cout << "COMMENT" << endl; }
+\/\/[^\n]* {cout << "COMMENT" << endl; }
 && { cout << "DAND" << endl; }
 \/ { cout << "DIVIDE" << endl; }
 \|\| { cout << "DOR" << endl; }
