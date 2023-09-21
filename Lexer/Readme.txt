@@ -15,7 +15,10 @@ both of which came with both these programs.
 The make file should handle all compilation so just type "make" into the terminal within a directory containing all
 included files. The make file should run flex on the lexer.l file "flex lexer.l", which should produce a file called
 lex.yy.c. It will then compile that file "g++ lex.yy.c -o lexer" and produce an executable file simply called lexer. It
-will then execute this file using our example "./lexer example.f23".
+will then execute this file using our example f23 file "./lexer example.f23".
 
 If you wish to test another file, simply call the executable again with whatever file you would to test. "./lexer file.f23".
 The executable lexer is designed to only take one argument, so if you give it no arguments or more than one it will print an error.
+
+# Output
+After lexing a file you should see all the tokens that the lexer found within the file printed to the terminal.

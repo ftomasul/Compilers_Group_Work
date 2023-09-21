@@ -6,18 +6,18 @@
 # Variables
 CXX=g++
 FLEX=flex
-# CXXFLAGS=-wall -g
+RUN=./
 RM=/bin/rm -f
 
 # Don't need to check for clean
 .PHONY: clean, run
 
 run: lexer
-	./lexer example.f23
+	${RUN}lexer example.f23
 
 # Compile lex into executable
 lexer: lex.yy.c 
-	${CXX} ${CXXFLAGS} lex.yy.c -o lexer
+	${CXX} lex.yy.c -o lexer
 
 # Run flex on lexer
 lex.yy.c: lexer.l
