@@ -10,7 +10,10 @@ FLEX=flex
 RM=/bin/rm -f
 
 # Don't need to check for clean
-.PHONY: clean
+.PHONY: clean, run
+
+run: lexer
+	./lexer example.f23
 
 # Compile lex into executable
 lexer: lex.yy.c 
