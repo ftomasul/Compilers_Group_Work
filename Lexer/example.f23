@@ -1,0 +1,44 @@
+// Finn Tomasula and Edward Gilbert
+// Example for lexer
+// The purpose of this file is to be run as an example for our lexer
+
+program calculator {
+
+    function integer do_operation(string op, integer x, integer y) {
+        if(op == "+") {
+            return x + y;
+        } else if(op == "-") {
+            return x - y;
+        } else if(op == "*") {
+            return x * y;
+        } else if(op == "/") {
+            return x / y;
+        }
+    }
+
+    procedure main() {
+        string operation;
+        integer x, y, result;
+
+        print_string("Welcome to your calculator!\n")
+
+        print_string("Enter your operation (+, -, *, /): ");
+        read_string(operation); 
+        while(operation != "+" || operation != "-" || operation != "*" || operation != "/") {
+            print_string("\nInvalid operator try again: ")
+            read_string(operation);  
+        }
+
+        print_string("\nEnter your first operand(must be an whole number): ");
+        read_integer(x);
+
+        print_string("\nEnter your second operand(must be an whole number): ");
+        read_integer(y);
+
+        result := do_operation(operation, x, y);
+
+        print_string("The result of your operation is ");
+        print_integer(result);
+
+    }
+}
