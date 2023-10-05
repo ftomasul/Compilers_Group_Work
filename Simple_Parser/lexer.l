@@ -3,6 +3,7 @@
 #include <cstdio>
 #include "y.tab.h"
 using namespace std;
+extern int yylval;
 %}
 
 %%
@@ -27,7 +28,7 @@ return { return K_RETURN; }
 string { return K_STRING; }
 then { return K_THEN; }
 while { return K_WHILE; }
--?[0-9]+ { return ICONSTANT; }
+-?[0-9]+ { yylval = atoi(yytext); return ICONSTANT; }
 -?([0-9]+([.][0-9]*)?|[.][0-9]+|[0-9]+([.][0-9]*)?[dD][+-]?[0-9]+) { return DCONSTANT; } 
 := { return ASSIGN; }
 \+= { return ASSIGN_PLUS; }

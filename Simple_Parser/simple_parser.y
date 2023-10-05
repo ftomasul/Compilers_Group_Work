@@ -9,8 +9,10 @@ using namespace std;
 
 %%
 
-expr: expr PLUS expr
-    | expr MINUS expr
+const: ICONSTANT { cout << "Found ICONSTANT: " << $1 << endl; }
+     | DCONSTANT { cout << "Found DCONSTANT: " << $1 << endl; }
+     | SCONSTANT { cout << "Found SCONSTANT: " << $1 << endl; }
+     ;
 
 %%
 
@@ -18,6 +20,7 @@ extern FILE *yyin;
 
 int main(int argc, char* argv[]) {
     if(argc == 2) {
+        cout << endl;
         cout << "Parsing " << argv[1] << endl;
         cout << endl;
 
