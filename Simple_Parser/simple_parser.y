@@ -5,14 +5,23 @@ using namespace std;
 
 %}
 
-%token K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ICONSTANT DCONSTANT ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT  
+%token K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ICONSTANT DCONSTANT ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT 
+
+%left PLUS MINUS
+%left MULTIPLY DIVIDE
 
 %%
 
-const: ICONSTANT { cout << "Found ICONSTANT: " << $1 << endl; }
-     | DCONSTANT { cout << "Found DCONSTANT: " << $1 << endl; }
-     | SCONSTANT { cout << "Found SCONSTANT: " << $1 << endl; }
-     ;
+arith_expr: arith_expr PLUS arith_expr { cout << "arith_expr + arith_expr" << endl; }
+          | arith_expr MINUS arith_expr { cout << "arith_expr - arith_expr" << endl; }
+          | ICONSTANT 
+          | DCONSTANT 
+          | SCONSTANT 
+          | IDENTIFIER 
+          ;
+
+
+
 
 %%
 
@@ -20,10 +29,6 @@ extern FILE *yyin;
 
 int main(int argc, char* argv[]) {
     if(argc == 2) {
-        cout << endl;
-        cout << "Parsing " << argv[1] << endl;
-        cout << endl;
-
         const char* filename = argv[1];
         FILE* file = fopen(filename, "r");
 
@@ -33,15 +38,19 @@ int main(int argc, char* argv[]) {
         }
 
         yyin = file;
+        cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << "+ Walking Through the Parse Tree Begins Here" << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << endl;
+
         do {
             yyparse();
         } while(!feof(yyin));
+
+        cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << "+ Done Walking Through Parse Tree" << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << endl;
+
 
         fclose(file);
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
     }
-    // blah
     return 0;
 }
 
