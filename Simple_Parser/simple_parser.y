@@ -20,9 +20,6 @@ arith_expr: arith_expr PLUS arith_expr { cout << "arith_expr + arith_expr" << en
           | IDENTIFIER 
           ;
 
-
-
-
 %%
 
 extern FILE *yyin;
