@@ -6,7 +6,7 @@
 # Variables
 CXX=g++
 FLEX=flex
-YACC=yacc
+YACC=bison
 RUN=./
 RM=/bin/rm -f
 FILE=test.txt
@@ -19,15 +19,16 @@ run: parser
 
 # Compile lex into executable
 parser: y.tab.c lex.yy.c 
-	${CXX} -o parser y.tab.c lex.yy.c -ll -lfl
+	${CXX} -o parser simple_parser.tab.c lex.yy.c -ll -lfl
+
+# Run yacc on parser
+y.tab.c: simple_parser.y
+	${YACC} -d -t simple_parser.y
 
 # Run flex on lexer
 lex.yy.c: lexer.l
 	${FLEX} lexer.l
 
-y.tab.c: simple_parser.y
-	${YACC} -d simple_parser.y
-
 # Removes all created files
 clean:
-	${RM} y.tab.c y.tab.h lex.yy.c parser
+	${RM} simple_parser.tab.c simple_parser.tab.h lex.yy.c parser

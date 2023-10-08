@@ -1,7 +1,7 @@
 %{
 #include <iostream>
 #include <cstdio>
-#include "y.tab.h"
+#include "simple_parser.tab.h"
 using namespace std;
 extern int yylval;
 %}
@@ -67,3 +67,4 @@ while { return K_WHILE; }
 . { cout << "No match" << endl; }
 
 %%
+
