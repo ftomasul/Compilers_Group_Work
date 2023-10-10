@@ -3,7 +3,6 @@
 #include <cstdio>
 #include "simple_parser.tab.h"
 using namespace std;
-extern int yylval;
 %}
 
 %%
@@ -28,8 +27,8 @@ return { return K_RETURN; }
 string { return K_STRING; }
 then { return K_THEN; }
 while { return K_WHILE; }
--?[0-9]+ { yylval = atoi(yytext); return ICONSTANT; }
--?([0-9]+([.][0-9]*)?|[.][0-9]+|[0-9]+([.][0-9]*)?[dD][+-]?[0-9]+) { return DCONSTANT; } 
+-?[0-9]+ { yylval.sym = strdup(yytext); return ICONSTANT; }
+-?([0-9]+([.][0-9]*)?|[.][0-9]+|[0-9]+([.][0-9]*)?[dD][+-]?[0-9]+) { yylval.sym = strdup(yytext); return DCONSTANT; } 
 := { return ASSIGN; }
 \+= { return ASSIGN_PLUS; }
 -= { return ASSIGN_MINUS; }
@@ -49,21 +48,21 @@ while { return K_WHILE; }
 \{ { return LCURLY; }
 \( { return LPAREN; }
 \< { return LT; }
-\- { return MINUS; }
+\- { yylval.sym = strdup(yytext); return MINUS; }
 \-\- { return DECREMENT; }
 % { return MOD; }
 \* { return MULTIPLY; }
 != { return NE; }
 ! { return NOT; }
 \. { return PERIOD; }
-\+ { return PLUS; }
+\+ { yylval.sym = strdup(yytext); return PLUS; }
 \+\+ { return INCREMENT; }
 ] { return RBRACKET; }
 \} { return RCURLY; }
 \) { return RPAREN; }
 ; { return SEMI; }
-[a-zA-Z$_][a-zA-Z0-9$_]{0,31} { return IDENTIFIER; }
-\"(\\.|[^"\\])*\" { return SCONSTANT; }
+[a-zA-Z$_][a-zA-Z0-9$_]{0,31} { yylval.sym = strdup(yytext); return IDENTIFIER; } // naughty 
+\"(\\.|[^"\\])*\" { yylval.sym = strdup(yytext); return SCONSTANT; }
 . { cout << "No match" << endl; }
 
 %%
