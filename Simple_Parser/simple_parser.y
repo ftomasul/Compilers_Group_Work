@@ -24,9 +24,9 @@ int currentNode;
 
 arith_exp: arith_exp PLUS arith_exp { cout << $1 << $2 << $3 << endl; }
 |   arith_exp MINUS arith_exp { cout << $1 << $2 << $3 << endl; }
-|   ICONSTANT {cout << "ICONSTANT" << endl; }
-|   DCONSTANT {cout << "DCONSTANT" << endl; }
-|   IDENTIFIER {cout << "IDENTIFIER" << endl; }
+|   ICONSTANT {cout << $1 << ": ICONSTANT" << endl; }
+|   DCONSTANT {cout << $1 << ": DCONSTANT" << endl; }
+|   IDENTIFIER {cout << $1 << ": IDENTIFIER" << endl; }
 ;
 
 
