@@ -6,22 +6,30 @@ using namespace std;
 int yyerror(const char* s);
 int yylex();
 
+int currentNode;
+
 %}
 
-%token K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ICONSTANT DCONSTANT ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT 
+%union {
+    double num;
+    char* sym;
+}
+
+%token<sym> K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT DCONSTANT ICONSTANT 
 
 %left PLUS MINUS
-%left MULTIPLY DIVIDE
+
+%type<sym> arith_exp
 
 %%
 
-arith_expr: arith_expr PLUS arith_expr { cout << "arith_expr + arith_expr: " << $1 << $2 << $3 << endl; }
-          | arith_expr MINUS arith_expr { cout << "arith_expr - arith_expr: " << $1 << $2 << $3 << endl; }
-          | ICONSTANT 
-          | DCONSTANT 
-          | SCONSTANT 
-          | IDENTIFIER 
-          ;
+arith_exp: ICONSTANT 
+|   DCONSTANT 
+|   IDENTIFIER 
+|   arith_exp PLUS arith_exp { cout << "Node " << currentNode++ << ": " << $1 << $2 << $3 << endl; }
+|   arith_exp MINUS arith_exp { cout << "Node " << currentNode++ << ": " << $1 << $2 << $3 << endl; }
+;
+
 
 %%
 
@@ -40,6 +48,7 @@ int main(int argc, char* argv[]) {
         yyin = file;
         cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << "+ Walking Through the Parse Tree Begins Here" << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << endl;
 
+        currentNode = 0;
         do {
             yyparse();
         } while(!feof(yyin));

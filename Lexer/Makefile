@@ -13,7 +13,7 @@ RM=/bin/rm -f
 .PHONY: clean, run
 
 run: lexer
-	${RUN}lexer example.f23
+	${RUN}lexer test.txt
 
 # Compile lex into executable
 lexer: lex.yy.c 
