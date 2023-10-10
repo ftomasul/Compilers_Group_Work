@@ -17,16 +17,17 @@ int currentNode;
 
 %token<sym> K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT DCONSTANT ICONSTANT 
 
+%left PLUS MINUS
 
 %type<sym> arith_exp
 
 %%
 
-arith_exp: arith_exp PLUS arith_exp { cout << $1 << $2 << $3 << endl; }
-|   arith_exp MINUS arith_exp { cout << $1 << $2 << $3 << endl; }
-|   ICONSTANT {cout << $1 << ": ICONSTANT" << endl; }
-|   DCONSTANT {cout << $1 << ": DCONSTANT" << endl; }
-|   IDENTIFIER {cout << $1 << ": IDENTIFIER" << endl; }
+arith_exp: ICONSTANT 
+|   DCONSTANT 
+|   IDENTIFIER 
+|   arith_exp PLUS arith_exp { cout << "Node " << currentNode++ << ": " << $1 << $2 << $3 << endl; }
+|   arith_exp MINUS arith_exp { cout << "Node " << currentNode++ << ": " << $1 << $2 << $3 << endl; }
 ;
 
 
