@@ -9,7 +9,7 @@ FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=test.txt
+FILE=Examples/te2.f23
 
 # Don't need to check for clean
 .PHONY: clean, run
@@ -19,7 +19,7 @@ run: parser
 
 # Compile lex into executable
 parser: y.tab.c lex.yy.c 
-	${CXX} -o parser simple_parser.tab.c lex.yy.c -ll -lfl
+	${CXX} -o parser simple_parser.tab.c lex.yy.c -ll
 
 # Run yacc on parser
 y.tab.c: simple_parser.y

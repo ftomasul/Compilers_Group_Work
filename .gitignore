@@ -1,2 +1,7 @@
 *.vscode
 /test.txt
+/yy.lex.c
+/simple_parser.tab.c
+/simple_parser.tab.h
+/parser
+/lexer
