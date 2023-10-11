@@ -19,7 +19,7 @@ run: parser
 
 # Compile lex into executable
 parser: y.tab.c lex.yy.c 
-	${CXX} -o parser simple_parser.tab.c lex.yy.c -ll -lfl
+	${CXX} -o parser simple_parser.tab.c lex.yy.c -ll
 
 # Run yacc on parser
 y.tab.c: simple_parser.y

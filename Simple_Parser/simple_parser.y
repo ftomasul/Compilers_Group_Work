@@ -18,17 +18,48 @@ int currentNode;
 %token<sym> K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT DCONSTANT ICONSTANT 
 
 %left PLUS MINUS
+%left MULTIPLY DIVIDE
+%nonassoc UMINUS
 
-%type<sym> arith_exp
+%type<sym> arith_exp bool_exp
 
 %%
 
-arith_exp: ICONSTANT 
-|   DCONSTANT 
-|   IDENTIFIER 
-|   arith_exp PLUS arith_exp { cout << "Node " << currentNode++ << ": " << $1 << $2 << $3 << endl; }
-|   arith_exp MINUS arith_exp { cout << "Node " << currentNode++ << ": " << $1 << $2 << $3 << endl; }
+arith_exp: arith_exp PLUS arith_exp { 
+        cout << "Node " << currentNode++ << ": " << "arith_exp PLUS arith_exp" << endl;
+        cout << "expression -> " << $1 << endl;
+        cout << "terminal symbol -> " << $2 << endl;
+        cout << "expression -> " << $3 << endl << endl;
+    }
+|   arith_exp MINUS arith_exp { 
+        cout << "Node " << currentNode++ << ": " << "arith_exp MINUS arith_exp" << endl; 
+        cout << "expression -> " << $1 << endl;
+        cout << "terminal symbol -> " << $2 << endl;
+        cout << "expression -> " << $3 << endl << endl;     
+    }
+|   arith_exp MULTIPLY arith_exp { 
+        cout << "Node " << currentNode++ << ": " << "arith_exp MULTIPLY arith_exp" << endl; 
+        cout << "expression -> " << $1 << endl;
+        cout << "terminal symbol -> " << $2 << endl;
+        cout << "expression -> " << $3 << endl << endl;  
+    }
+|   arith_exp DIVIDE arith_exp { 
+        cout << "Node " << currentNode++ << ": " << "arith_exp DIVIDE arith_exp" << endl; 
+        cout << "expression -> " << $1 << endl;
+        cout << "terminal symbol -> " << $2 << endl;
+        cout << "expression -> " << $3 << endl << endl;  
+    }
+|   MINUS arith_exp %prec UMINUS { 
+        cout << "Node " << currentNode++ << ": " << "UMINUS arith_exp" << endl; 
+        cout << "terminal symbol -> " << $1 << endl;
+        cout << "expression -> " << $2 << endl << endl;  
+    }
+|   LPAREN arith_exp RPAREN { cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; }
+|   ICONSTANT
+|   DCONSTANT
+|   IDENTIFIER
 ;
+
 
 
 %%
