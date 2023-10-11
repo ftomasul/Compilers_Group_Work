@@ -21,9 +21,88 @@ int currentNode;
 %left MULTIPLY DIVIDE
 %nonassoc UMINUS
 
-%type<sym> arith_exp bool_exp
+%type<sym> arith_exp
 
 %%
+
+program: K_PROGRAM IDENTIFIER code_block
+;
+
+function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block
+;
+
+arg_list: arg_list COMMA arg
+|   arg
+;
+
+arg: type IDENTIFIER
+|
+;
+
+function_call: IDENTIFIER LPAREN param_list RPAREN
+;
+
+param_list: param_list COMMA param
+|   param
+;
+
+param: SCONSTANT
+|   ICONSTANT
+|   DCONSTANT
+|   IDENTIFIER
+|
+;
+
+print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN
+|   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN
+|   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN
+|   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN
+|   K_PRINT_STRING LPAREN IDENTIFIER RPAREN
+|   K_PRINT_STRING LPAREN SCONSTANT RPAREN
+;
+
+iden_dec: type IDENTIFIER
+;
+
+iden_assign: IDENTIFIER assign_op IDENTIFIER
+|   IDENTIFIER assign_op ICONSTANT
+|   IDENTIFIER assign_op DCONSTANT
+|   IDENTIFIER assign_op SCONSTANT
+|   iden_dec assign_op IDENTIFIER
+|   iden_dec assign_op ICONSTANT
+|   iden_dec assign_op DCONSTANT
+|   iden_dec assign_op SCONSTANT
+;
+
+type: K_INTEGER
+|   K_DOUBLE
+|   K_STRING
+;
+
+assign_op: ASSIGN 
+|   ASSIGN_PLUS 
+|   ASSIGN_MINUS 
+|   ASSIGN_MULTIPLY 
+|   ASSIGN_DIVIDE 
+|   ASSIGN_MOD
+;
+
+code_block: LCURLY code RCURLY
+;
+
+code: line code
+|   function_dec code
+|
+;
+
+line: arith_exp SEMI
+|   iden_dec SEMI
+|   iden_assign SEMI
+|   SCONSTANT SEMI
+|   function_call SEMI
+|   COMMENT
+|   print SEMI
+;
 
 arith_exp: arith_exp PLUS arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp PLUS arith_exp" << endl;
