@@ -1,6 +1,10 @@
-program test 
+program tiny_example_1
 {
-    funky(i);
+    function integer main()
+    {
+        integer i;
+        string str;
+    }
 }
 
 
