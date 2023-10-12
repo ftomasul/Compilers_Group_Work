@@ -1,6 +1,7 @@
 %{
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
 using namespace std;
 
 int yyerror(const char* s);
@@ -21,14 +22,14 @@ int currentNode;
 %left MULTIPLY DIVIDE
 %nonassoc UMINUS
 
-%type<sym> arith_exp
+%type<sym> program function_dec arg_list arg function_call param_list param print iden_dec iden_assign type assign_op code_block code line arith_exp
 
 %%
 
-program: K_PROGRAM IDENTIFIER code_block
+program: K_PROGRAM IDENTIFIER code_block { cout << "Node " << currentNode++ << ": " << "program start" << endl; } 
 ;
 
-function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block
+function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block { cout << "Node " << currentNode++ << ": " << "function -> " << $3 << endl; } 
 ;
 
 arg_list: arg_list COMMA arg
@@ -36,7 +37,7 @@ arg_list: arg_list COMMA arg
 ;
 
 arg: type IDENTIFIER
-|
+|    %empty { /*empty*/ }
 ;
 
 function_call: IDENTIFIER LPAREN param_list RPAREN
@@ -50,7 +51,7 @@ param: SCONSTANT
 |   ICONSTANT
 |   DCONSTANT
 |   IDENTIFIER
-|
+|   %empty { /*empty*/ }
 ;
 
 print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN
@@ -61,7 +62,7 @@ print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN
 |   K_PRINT_STRING LPAREN SCONSTANT RPAREN
 ;
 
-iden_dec: type IDENTIFIER
+iden_dec: type IDENTIFIER { cout << "Node " << currentNode++ << ": " << $1 << " " << $2 << endl; } 
 ;
 
 iden_assign: IDENTIFIER assign_op IDENTIFIER
@@ -91,17 +92,17 @@ code_block: LCURLY code RCURLY
 ;
 
 code: line code
-|   function_dec code
-|
+|   %empty { /*empty*/ }
 ;
 
-line: arith_exp SEMI
-|   iden_dec SEMI
-|   iden_assign SEMI
-|   SCONSTANT SEMI
-|   function_call SEMI
-|   COMMENT
-|   print SEMI
+line: arith_exp SEMI 
+|   iden_dec SEMI 
+|   iden_assign SEMI 
+|   SCONSTANT SEMI 
+|   function_call SEMI 
+|   COMMENT 
+|   print SEMI 
+|   function_dec 
 ;
 
 arith_exp: arith_exp PLUS arith_exp { 
@@ -109,37 +110,43 @@ arith_exp: arith_exp PLUS arith_exp {
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;
+        $$ = strdup("arith_exp");
     }
 |   arith_exp MINUS arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp MINUS arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;     
+        cout << "expression -> " << $3 << endl << endl;
+        $$ = strdup("arith_exp");             
     }
 |   arith_exp MULTIPLY arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp MULTIPLY arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;  
+        $$ = strdup("arith_exp");
     }
 |   arith_exp DIVIDE arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp DIVIDE arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;  
+        cout << "expression -> " << $3 << endl << endl;
+        $$ = strdup("arith_exp");  
     }
 |   MINUS arith_exp %prec UMINUS { 
         cout << "Node " << currentNode++ << ": " << "UMINUS arith_exp" << endl; 
         cout << "terminal symbol -> " << $1 << endl;
         cout << "expression -> " << $2 << endl << endl;  
+        $$ = strdup("arith_exp");
     }
-|   LPAREN arith_exp RPAREN { cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; }
+|   LPAREN arith_exp RPAREN { 
+        cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; 
+        $$ = strdup("arith_exp");
+    }
 |   ICONSTANT
 |   DCONSTANT
 |   IDENTIFIER
 ;
-
-
 
 %%
 
