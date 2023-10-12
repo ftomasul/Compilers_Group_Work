@@ -38,7 +38,7 @@ arg_list: arg_list COMMA arg
 |   arg
 ;
 
-arg: type IDENTIFIER
+arg: type IDENTIFIER { $$ = $2; }
 |    %empty { /*empty*/ }
 ;
 
@@ -64,17 +64,17 @@ print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN { cout << "Node " << currentNode
 |   K_PRINT_STRING LPAREN SCONSTANT RPAREN { cout << "Node " << currentNode++ << ": print_string -> " << $3 << endl; }
 ;
 
-iden_dec :  type IDENTIFIER { cout << "Node " << currentNode++ << ": " << $1 << " " << $2 << endl; } 
+iden_dec :  type IDENTIFIER { cout << "Node " << currentNode++ << ": declaration -> " << $1 << " " << $2 << endl; } 
 ;
 
-iden_assign: IDENTIFIER assign_op IDENTIFIER
-|   IDENTIFIER assign_op ICONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << " =: " << $3 << endl; }
-|   IDENTIFIER assign_op DCONSTANT
-|   IDENTIFIER assign_op SCONSTANT
-|   iden_dec assign_op IDENTIFIER
-|   iden_dec assign_op ICONSTANT
-|   iden_dec assign_op DCONSTANT
-|   iden_dec assign_op SCONSTANT
+iden_assign: IDENTIFIER assign_op IDENTIFIER { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+|   IDENTIFIER assign_op ICONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+|   IDENTIFIER assign_op DCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+|   IDENTIFIER assign_op SCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+|   iden_dec assign_op IDENTIFIER { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+|   iden_dec assign_op ICONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+|   iden_dec assign_op DCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+|   iden_dec assign_op SCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
 ;
 
 type: K_INTEGER
@@ -100,7 +100,6 @@ code: line code
 line: arith_exp SEMI 
 |   iden_dec SEMI 
 |   iden_assign SEMI 
-|   SCONSTANT SEMI 
 |   function_call SEMI 
 |   COMMENT 
 |   print SEMI 
@@ -145,7 +144,7 @@ arith_exp: arith_exp PLUS arith_exp {
         cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; 
         $$ = strdup("parse tree node");
     }
-|   ICONSTANT
+|   ICONSTANT 
 |   DCONSTANT
 |   IDENTIFIER
 ;
