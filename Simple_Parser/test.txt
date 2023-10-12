@@ -1,10 +1,6 @@
-program tiny_example_1
+program blah
 {
-    function integer main()
-    {
-        integer i;
-        string str;
-    }
+    a + 1 - b;
 }
 
 

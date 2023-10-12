@@ -1,6 +1,7 @@
 %{
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
 using namespace std;
 
 int yyerror(const char* s);
@@ -109,31 +110,39 @@ arith_exp: arith_exp PLUS arith_exp {
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;
+        $$ = strdup("arith_exp");
     }
 |   arith_exp MINUS arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp MINUS arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;     
+        cout << "expression -> " << $3 << endl << endl;
+        $$ = strdup("arith_exp");             
     }
 |   arith_exp MULTIPLY arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp MULTIPLY arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;  
+        $$ = strdup("arith_exp");
     }
 |   arith_exp DIVIDE arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp DIVIDE arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;  
+        cout << "expression -> " << $3 << endl << endl;
+        $$ = strdup("arith_exp");  
     }
 |   MINUS arith_exp %prec UMINUS { 
         cout << "Node " << currentNode++ << ": " << "UMINUS arith_exp" << endl; 
         cout << "terminal symbol -> " << $1 << endl;
         cout << "expression -> " << $2 << endl << endl;  
+        $$ = strdup("arith_exp");
     }
-|   LPAREN arith_exp RPAREN { cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; }
+|   LPAREN arith_exp RPAREN { 
+        cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; 
+        $$ = strdup("arith_exp");
+    }
 |   ICONSTANT
 |   DCONSTANT
 |   IDENTIFIER
