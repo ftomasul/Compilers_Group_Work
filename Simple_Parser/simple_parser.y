@@ -26,10 +26,12 @@ int currentNode;
 
 %%
 
-program: K_PROGRAM IDENTIFIER code_block { cout << "Node " << currentNode++ << ": " << "program start" << endl; } 
+
+
+program: K_PROGRAM IDENTIFIER code_block { cout << "Node " << currentNode++ << ": " << "program -> " << $2 << endl; } 
 ;
 
-function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block { cout << "Node " << currentNode++ << ": " << "function -> " << $3 << endl; } 
+function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block { cout << "Node " << currentNode++ << ": " << $2 << " function_dec -> " << $3 << endl; } 
 ;
 
 arg_list: arg_list COMMA arg
@@ -40,7 +42,7 @@ arg: type IDENTIFIER
 |    %empty { /*empty*/ }
 ;
 
-function_call: IDENTIFIER LPAREN param_list RPAREN
+function_call: IDENTIFIER LPAREN param_list RPAREN { cout << "Node " << currentNode++ << ": function_call -> " << $1 << endl; }
 ;
 
 param_list: param_list COMMA param
@@ -54,19 +56,19 @@ param: SCONSTANT
 |   %empty { /*empty*/ }
 ;
 
-print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN
-|   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN
-|   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN
-|   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN
-|   K_PRINT_STRING LPAREN IDENTIFIER RPAREN
-|   K_PRINT_STRING LPAREN SCONSTANT RPAREN
+print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN { cout << "Node " << currentNode++ << ": print_integer -> " << $3 << endl; }
+|   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN { cout << "Node " << currentNode++ << ": print_integer -> " << $3 << endl; }
+|   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN { cout << "Node " << currentNode++ << ": print_double -> " << $3 << endl; }
+|   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN { cout << "Node " << currentNode++ << ": print_double -> " << $3 << endl; }
+|   K_PRINT_STRING LPAREN IDENTIFIER RPAREN { cout << "Node " << currentNode++ << ": print_string -> " << $3 << endl; }
+|   K_PRINT_STRING LPAREN SCONSTANT RPAREN { cout << "Node " << currentNode++ << ": print_string -> " << $3 << endl; }
 ;
 
-iden_dec: type IDENTIFIER { cout << "Node " << currentNode++ << ": " << $1 << " " << $2 << endl; } 
+iden_dec :  type IDENTIFIER { cout << "Node " << currentNode++ << ": " << $1 << " " << $2 << endl; } 
 ;
 
 iden_assign: IDENTIFIER assign_op IDENTIFIER
-|   IDENTIFIER assign_op ICONSTANT
+|   IDENTIFIER assign_op ICONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << " =: " << $3 << endl; }
 |   IDENTIFIER assign_op DCONSTANT
 |   IDENTIFIER assign_op SCONSTANT
 |   iden_dec assign_op IDENTIFIER
@@ -110,43 +112,44 @@ arith_exp: arith_exp PLUS arith_exp {
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;
-        $$ = strdup("arith_exp");
+        $$ = strdup("parse tree node");
     }
 |   arith_exp MINUS arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp MINUS arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;
-        $$ = strdup("arith_exp");             
+        $$ = strdup("parse tree node");             
     }
 |   arith_exp MULTIPLY arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp MULTIPLY arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;  
-        $$ = strdup("arith_exp");
+        $$ = strdup("parse tree node");
     }
 |   arith_exp DIVIDE arith_exp { 
         cout << "Node " << currentNode++ << ": " << "arith_exp DIVIDE arith_exp" << endl; 
         cout << "expression -> " << $1 << endl;
         cout << "terminal symbol -> " << $2 << endl;
         cout << "expression -> " << $3 << endl << endl;
-        $$ = strdup("arith_exp");  
+        $$ = strdup("parse tree node");  
     }
 |   MINUS arith_exp %prec UMINUS { 
         cout << "Node " << currentNode++ << ": " << "UMINUS arith_exp" << endl; 
         cout << "terminal symbol -> " << $1 << endl;
         cout << "expression -> " << $2 << endl << endl;  
-        $$ = strdup("arith_exp");
+        $$ = strdup("parse tree node");
     }
 |   LPAREN arith_exp RPAREN { 
         cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; 
-        $$ = strdup("arith_exp");
+        $$ = strdup("parse tree node");
     }
 |   ICONSTANT
 |   DCONSTANT
 |   IDENTIFIER
 ;
+
 
 %%
 
