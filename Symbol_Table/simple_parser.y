@@ -2,11 +2,11 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "symbol_table.h"
 using namespace std;
 
 int yyerror(const char* s);
 int yylex();
-
 int currentNode;
 
 %}
@@ -14,6 +14,7 @@ int currentNode;
 %union {
     double num;
     char* sym;
+    struct symtab *table;
 }
 
 %token<sym> K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT DCONSTANT ICONSTANT 
@@ -189,4 +190,19 @@ int yywrap() {
 int yyerror(const char *s) {
     cerr << "Parse error: " << s << endl;
     return 0;
+}
+
+struct symtab *symlook(char* s) {
+    struct symtab *sp;
+    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        if(sp->name && !strcmp(sp->name, s)) {
+            return sp;
+        }
+        if(!sp->name) {
+            sp->name = strdup(s);
+            return sp;
+        }
+    }
+    yyerror("Too many symbols");
+    exit(1);
 }
