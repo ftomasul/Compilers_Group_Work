@@ -9,7 +9,7 @@ FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=te1.f23
+FILE=test.txt
 
 # Don't need to check for clean
 .PHONY: clean, run
