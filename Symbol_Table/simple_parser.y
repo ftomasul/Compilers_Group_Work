@@ -27,21 +27,21 @@ int currentNode;
 
 %%
 
-program: K_PROGRAM IDENTIFIER code_block { cout << "Node " << currentNode++ << ": " << "program -> " << $2 << endl; } 
+program: K_PROGRAM IDENTIFIER code_block {} 
 ;
 
-function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block { cout << "Node " << currentNode++ << ": " << $2 << " function_dec -> " << $3 << endl; } 
+function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block {} 
 ;
 
 arg_list: arg_list COMMA arg
 |   arg
 ;
 
-arg: type IDENTIFIER { $$ = $2; }
+arg: type IDENTIFIER {}
 |    %empty { /*empty*/ }
 ;
 
-function_call: IDENTIFIER LPAREN param_list RPAREN { cout << "Node " << currentNode++ << ": function_call -> " << $1 << endl; }
+function_call: IDENTIFIER LPAREN param_list RPAREN {}
 ;
 
 param_list: param_list COMMA param
@@ -55,25 +55,25 @@ param: SCONSTANT
 |   %empty { /*empty*/ }
 ;
 
-print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN { cout << "Node " << currentNode++ << ": print_integer -> " << $3 << endl; }
-|   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN { cout << "Node " << currentNode++ << ": print_integer -> " << $3 << endl; }
-|   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN { cout << "Node " << currentNode++ << ": print_double -> " << $3 << endl; }
-|   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN { cout << "Node " << currentNode++ << ": print_double -> " << $3 << endl; }
-|   K_PRINT_STRING LPAREN IDENTIFIER RPAREN { cout << "Node " << currentNode++ << ": print_string -> " << $3 << endl; }
-|   K_PRINT_STRING LPAREN SCONSTANT RPAREN { cout << "Node " << currentNode++ << ": print_string -> " << $3 << endl; }
+print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {}
+|   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN {}
+|   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN {}
+|   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN {}
+|   K_PRINT_STRING LPAREN IDENTIFIER RPAREN {}
+|   K_PRINT_STRING LPAREN SCONSTANT RPAREN {}
 ;
 
-iden_dec :  type IDENTIFIER { cout << "Node " << currentNode++ << ": declaration -> " << $1 << " " << $2 << endl; } 
+iden_dec :  type IDENTIFIER {} 
 ;
 
-iden_assign: IDENTIFIER assign_op IDENTIFIER { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
-|   IDENTIFIER assign_op ICONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
-|   IDENTIFIER assign_op DCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
-|   IDENTIFIER assign_op SCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
-|   iden_dec assign_op IDENTIFIER { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
-|   iden_dec assign_op ICONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
-|   iden_dec assign_op DCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
-|   iden_dec assign_op SCONSTANT { cout << "Node " << currentNode++ << ": assign -> " << $1 << $2 << $3 << endl; }
+iden_assign: IDENTIFIER assign_op IDENTIFIER {}
+|   IDENTIFIER assign_op ICONSTANT {}
+|   IDENTIFIER assign_op DCONSTANT {}
+|   IDENTIFIER assign_op SCONSTANT {}
+|   iden_dec assign_op IDENTIFIER {}
+|   iden_dec assign_op ICONSTANT {}
+|   iden_dec assign_op DCONSTANT {}
+|   iden_dec assign_op SCONSTANT {}
 ;
 
 type: K_INTEGER
@@ -105,44 +105,12 @@ line: arith_exp SEMI
 |   function_dec 
 ;
 
-arith_exp: arith_exp PLUS arith_exp { 
-        cout << "Node " << currentNode++ << ": " << "arith_exp PLUS arith_exp" << endl;
-        cout << "expression -> " << $1 << endl;
-        cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;
-        $$ = strdup("parse tree node");
-    }
-|   arith_exp MINUS arith_exp { 
-        cout << "Node " << currentNode++ << ": " << "arith_exp MINUS arith_exp" << endl; 
-        cout << "expression -> " << $1 << endl;
-        cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;
-        $$ = strdup("parse tree node");             
-    }
-|   arith_exp MULTIPLY arith_exp { 
-        cout << "Node " << currentNode++ << ": " << "arith_exp MULTIPLY arith_exp" << endl; 
-        cout << "expression -> " << $1 << endl;
-        cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;  
-        $$ = strdup("parse tree node");
-    }
-|   arith_exp DIVIDE arith_exp { 
-        cout << "Node " << currentNode++ << ": " << "arith_exp DIVIDE arith_exp" << endl; 
-        cout << "expression -> " << $1 << endl;
-        cout << "terminal symbol -> " << $2 << endl;
-        cout << "expression -> " << $3 << endl << endl;
-        $$ = strdup("parse tree node");  
-    }
-|   MINUS arith_exp %prec UMINUS { 
-        cout << "Node " << currentNode++ << ": " << "UMINUS arith_exp" << endl; 
-        cout << "terminal symbol -> " << $1 << endl;
-        cout << "expression -> " << $2 << endl << endl;  
-        $$ = strdup("parse tree node");
-    }
-|   LPAREN arith_exp RPAREN { 
-        cout << "Node " << currentNode++ << ": " << "LPAREN arith_exp RPAREN" << endl; 
-        $$ = strdup("parse tree node");
-    }
+arith_exp: arith_exp PLUS arith_exp {}
+|   arith_exp MINUS arith_exp {}
+|   arith_exp MULTIPLY arith_exp {}
+|   arith_exp DIVIDE arith_exp {}
+|   MINUS arith_exp %prec UMINUS {}
+|   LPAREN arith_exp RPAREN {}
 |   ICONSTANT 
 |   DCONSTANT
 |   IDENTIFIER
@@ -164,17 +132,21 @@ int main(int argc, char* argv[]) {
         }
 
         yyin = file;
-        cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << "+ Walking Through the Parse Tree Begins Here" << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << endl;
 
         currentNode = 0;
         do {
             yyparse();
         } while(!feof(yyin));
-
-        cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << "+ Done Walking Through Parse Tree" << endl << "++++++++++++++++++++++++++++++++++++++++++++++++" << endl << endl;
-
-
         fclose(file);
+        
+        int tableIndex = 0;
+        struct symtab *sp;
+        for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+            if(sp->name) {
+                cout << tableIndex++ << ": " << sp->name << endl;
+            }
+        }
+
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
     }
@@ -190,7 +162,19 @@ int yyerror(const char *s) {
     return 0;
 }
 
-struct symtab *symlook(char *s) {
+struct symtab *symlook(char *s) {    
+    char *p;
     struct symtab *sp;
-    return sp;
+
+    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+        if(sp->name && !strcmp(sp->name, s)) {
+            return sp;
+        }
+        if(!sp->name) {
+            sp->name = strdup(s);
+            return sp;
+        }
+    }
+    yyerror("Too many symbols");
+    exit(1);
 }
