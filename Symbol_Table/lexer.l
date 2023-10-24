@@ -1,9 +1,11 @@
 %{
+
 #include <iostream>
 #include <cstdio>
 #include "simple_parser.tab.h"
-#include "symbol_table.h"
 using namespace std;
+
+struct symtab *symlook(char *s);
 
 %}
 

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
-#include "symbol_table.h"
+#include "symtab.h"
 using namespace std;
 
 int yyerror(const char* s);
@@ -13,7 +13,7 @@ int currentNode;
 
 %union {
     double num;
-    char* sym;
+    char *sym;
     struct symtab *table;
 }
 
@@ -26,8 +26,6 @@ int currentNode;
 %type<sym> program function_dec arg_list arg function_call param_list param print iden_dec iden_assign type assign_op code_block code line arith_exp
 
 %%
-
-
 
 program: K_PROGRAM IDENTIFIER code_block { cout << "Node " << currentNode++ << ": " << "program -> " << $2 << endl; } 
 ;
@@ -192,17 +190,7 @@ int yyerror(const char *s) {
     return 0;
 }
 
-struct symtab *symlook(char* s) {
+struct symtab *symlook(char *s) {
     struct symtab *sp;
-    for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
-        if(sp->name && !strcmp(sp->name, s)) {
-            return sp;
-        }
-        if(!sp->name) {
-            sp->name = strdup(s);
-            return sp;
-        }
-    }
-    yyerror("Too many symbols");
-    exit(1);
+    return sp;
 }

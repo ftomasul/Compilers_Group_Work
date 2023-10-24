@@ -4,5 +4,3 @@ struct symtab
 {
     char* name;
 } symtab[NSYMS];
-
-struct symtab *symlook(char* s);
