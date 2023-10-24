@@ -1,8 +1,12 @@
 %{
+
 #include <iostream>
 #include <cstdio>
 #include "simple_parser.tab.h"
 using namespace std;
+
+struct symtab *symlook(char *s);
+
 %}
 
 %%
@@ -61,7 +65,7 @@ while { yylval.sym = strdup(yytext); return K_WHILE; }
 \} { yylval.sym = strdup(yytext); return RCURLY; }
 \) { yylval.sym = strdup(yytext); return RPAREN; }
 ; { yylval.sym = strdup(yytext); return SEMI; }
-[a-zA-Z$_][a-zA-Z0-9$_]{0,31} { yylval.sym = strdup(yytext); return IDENTIFIER; } // naughty 
+[a-zA-Z$_][a-zA-Z0-9$_]{0,31} { yylval.table = symlook(yytext); return IDENTIFIER; } 
 \"(\\.|[^"\\])*\" { yylval.sym = strdup(yytext); return SCONSTANT; }
 . { cout << "No match" << endl; }
 

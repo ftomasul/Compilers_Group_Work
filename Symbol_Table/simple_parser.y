@@ -2,18 +2,19 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "symtab.h"
 using namespace std;
 
 int yyerror(const char* s);
 int yylex();
-
 int currentNode;
 
 %}
 
 %union {
     double num;
-    char* sym;
+    char *sym;
+    struct symtab *table;
 }
 
 %token<sym> K_DO K_DOUBLE K_ELSE K_EXIT K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA COMMENT DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PERIOD PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER SCONSTANT DCONSTANT ICONSTANT 
@@ -25,8 +26,6 @@ int currentNode;
 %type<sym> program function_dec arg_list arg function_call param_list param print iden_dec iden_assign type assign_op code_block code line arith_exp
 
 %%
-
-
 
 program: K_PROGRAM IDENTIFIER code_block { cout << "Node " << currentNode++ << ": " << "program -> " << $2 << endl; } 
 ;
@@ -189,4 +188,9 @@ int yywrap() {
 int yyerror(const char *s) {
     cerr << "Parse error: " << s << endl;
     return 0;
+}
+
+struct symtab *symlook(char *s) {
+    struct symtab *sp;
+    return sp;
 }
