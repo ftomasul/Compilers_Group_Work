@@ -9,17 +9,17 @@ FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=test.txt
+FILE=te1.f23
 
 # Don't need to check for clean
 .PHONY: clean, run
 
-run: parser
-	${RUN}parser ${FILE}
+run: symtab
+	${RUN}symtab ${FILE}
 
 # Compile lex into executable
-parser: y.tab.c lex.yy.c 
-	${CXX} -o parser simple_parser.tab.c lex.yy.c -ll
+symtab: y.tab.c lex.yy.c 
+	${CXX} -o symtab simple_parser.tab.c lex.yy.c -ll
 
 # Run yacc on parser
 y.tab.c: simple_parser.y
@@ -31,4 +31,4 @@ lex.yy.c: lexer.l
 
 # Removes all created files
 clean:
-	${RM} simple_parser.tab.c simple_parser.tab.h lex.yy.c parser
+	${RM} simple_parser.tab.c simple_parser.tab.h lex.yy.c symtab
