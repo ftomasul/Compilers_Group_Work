@@ -65,7 +65,15 @@ while { yylval.sym = strdup(yytext); return K_WHILE; }
 \} { yylval.sym = strdup(yytext); return RCURLY; }
 \) { yylval.sym = strdup(yytext); return RPAREN; }
 ; { yylval.sym = strdup(yytext); return SEMI; }
-[a-zA-Z$_][a-zA-Z0-9$_]{0,31} { yylval.table = symlook(yytext); return IDENTIFIER; } 
+[a-zA-Z$_][a-zA-Z0-9$_]{0,31} { 
+    cout << "Before" << endl;
+    
+    yylval.table = symlook(yytext);
+
+    cout << "After" << endl; 
+    
+    return IDENTIFIER; 
+} 
 \"(\\.|[^"\\])*\" { yylval.sym = strdup(yytext); return SCONSTANT; }
 . { cout << "No match" << endl; }
 

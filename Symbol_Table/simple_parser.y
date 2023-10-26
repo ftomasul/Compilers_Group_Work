@@ -8,8 +8,9 @@ using namespace std;
 
 int yyerror(const char *s);
 int yylex();
-int currentNode;
 struct symtab *symupdate(char *s, char *v, int type);
+int symhash(char *s);
+
 
 %}
 
@@ -32,8 +33,10 @@ struct symtab *symupdate(char *s, char *v, int type);
 %%
 
 program: K_PROGRAM IDENTIFIER code_block {
+    // cout << "Before" << endl;
     struct symtab *sp; 
     sp = symupdate($2->name, $1, 2);
+    // cout << "After" << endl;
 } 
 ;
 
@@ -77,6 +80,7 @@ print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {}
 iden_dec :  type IDENTIFIER { 
     struct symtab *sp;
     char *token = strdup("identifier");
+
     sp = symupdate($2->name, token, 2);
     sp = symupdate($2->name, $1, 1);
 } 
@@ -186,7 +190,9 @@ int main(int argc, char* argv[]) {
         yyin = file;
 
         do {
+            cout << "Before" << endl;
             yyparse();
+            cout << "After" << endl;
         } while(!feof(yyin));
         fclose(file);
         
@@ -194,13 +200,13 @@ int main(int argc, char* argv[]) {
         struct symtab *sp;
         cout << endl;
         cout << "*** Printing Symbol Table ***" << endl;
-        cout << setw(20) << left << "Index" << setw(20) << left << "Name" << setw(20) << left << "Token" << setw(20) << left << "Type" << setw(20) << left << "Value" << endl;
+        /* cout << setw(20) << left << "Index" << setw(20) << left << "Name" << setw(20) << left << "Token" << setw(20) << left << "Type" << setw(20) << left << "Value" << endl;
         for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
             if(sp->name) {
                 cout << setw(20) << tableIndex++ << setw(20) << sp->name << setw(20) << sp->token << setw(20) << sp->type << setw(20) << sp->value << endl;
             }
         }
-        cout << endl;
+        cout << endl; */
 
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
@@ -217,7 +223,7 @@ int yyerror(const char *s) {
     return 0;
 }
 
-struct symtab *symlook(char *s) {    
+/* struct symtab *symlook(char *s) {    
     struct symtab *sp;
 
     for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
@@ -234,9 +240,61 @@ struct symtab *symlook(char *s) {
     }
     yyerror("Too many symbols");
     exit(1);
+} */
+
+
+struct symtab *symlook(char *s) {
+    int key = symhash(s);
+    struct symtab *sp;
+    sp = symtab;
+
+    if(sp[key].name) {
+        return sp;
+    }
+    if(!sp[key].name) {
+        sp[key].name = strdup(s);
+        sp[key].token = strdup("null");
+        sp[key].type = strdup("null");
+        sp[key].value = strdup("null");
+        return sp;
+    }
+
+    yyerror("Too many symbols");
+    exit(1);
+
 }
 
+
 struct symtab *symupdate(char *s, char *v, int type) {
+    int key = symhash(s);
+    struct symtab *sp;
+    sp = symtab;
+    cout << "Key: " << key << endl;
+
+    if(sp[key].name) {
+        cout << "Name: " << sp[key].name << endl;
+        if(type == 0) {
+            sp[key].value = strdup(v);
+            return sp;
+        } else if(type == 1) {
+            sp[key].type = strdup(v);
+            return sp;
+        } else if(type == 2) {
+            sp[key].token = strdup(v);
+            return sp;
+        } else {
+            yyerror("Update: invalid type being added");
+            exit(1);
+        }
+    }
+    if(!sp[key].name) {
+        yyerror("Attempting to update table before adding name");
+        exit(1);
+    }
+    yyerror("Too many symbols");
+    exit(1);
+}
+/* struct symtab *symupdate(char *s, char *v, int type) {
     // Function to update an index of the symbol table. s is the
     // name of the index to update, v is the value we are adding
     // and type is the type of field (value=0, type=1 or token=2) 
@@ -246,6 +304,8 @@ struct symtab *symupdate(char *s, char *v, int type) {
     for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
 
         if(sp->name && !strcmp(sp->name, s)) {
+            cout << endl;
+            cout << s << " current value: " << sp->value << endl;
             if(type == 0) {
                 sp->value = strdup(v);
                 return sp;
@@ -267,4 +327,13 @@ struct symtab *symupdate(char *s, char *v, int type) {
     }
     yyerror("Too many symbols");
     exit(1);
+} */
+
+int symhash(char *s) {
+    int key = 0;
+    for(int i = 0; i < strlen(s); i++) {
+        key += s[i];
+    }
+
+    return key % NSYMS;
 }
