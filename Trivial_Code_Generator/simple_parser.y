@@ -190,18 +190,12 @@ int main(int argc, char* argv[]) {
             yyparse();
         } while(!feof(yyin));
         fclose(file);
-        
-        int tableIndex = 0;
-        struct symtab *sp;
-        cout << endl;
-        cout << "*** Printing Symbol Table ***" << endl;
-        cout << setw(20) << left << "Index" << setw(20) << left << "Name" << setw(20) << left << "Token" << setw(20) << left << "Type" << setw(20) << left << "Value" << endl;
-        for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
-            if(sp->name) {
-                cout << setw(20) << tableIndex++ << setw(20) << sp->name << setw(20) << sp->token << setw(20) << sp->type << setw(20) << sp->value << endl;
-            }
-        }
-        cout << endl;
+
+        FILE* outFile = fopen("yourmain.h", "w");
+
+        // Generate code
+
+        fclose(outFile);
 
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;

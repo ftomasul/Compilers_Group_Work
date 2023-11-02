@@ -9,7 +9,7 @@ FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=test.txt
+FILE=Examples/te2
 
 # Don't need to check for clean
 .PHONY: clean, run
@@ -31,4 +31,4 @@ lex.yy.c: lexer.l
 
 # Removes all created files
 clean:
-	${RM} simple_parser.tab.c simple_parser.tab.h lex.yy.c symtab
+	${RM} simple_parser.tab.c simple_parser.tab.h lex.yy.c symtab yourmain.h
