@@ -19,7 +19,7 @@ run: symtab
 
 # Compile lex into executable
 symtab: y.tab.c lex.yy.c 
-	${CXX} -o symtab simple_parser.tab.c lex.yy.c -ll
+	${CXX} -o symtab simple_parser.tab.c lex.yy.c
 
 # Run yacc on parser
 y.tab.c: simple_parser.y

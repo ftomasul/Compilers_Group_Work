@@ -5,6 +5,7 @@
 #include "simple_parser.tab.h"
 using namespace std;
 
+// int yywrap();
 struct symtab *symlook(char *s);
 
 %}
@@ -70,4 +71,8 @@ while { yylval.sym = strdup(yytext); return K_WHILE; }
 . { cout << "No match" << endl; }
 
 %%
+
+int yywrap() {
+    return 1;
+}
 

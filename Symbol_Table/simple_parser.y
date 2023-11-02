@@ -8,6 +8,7 @@ using namespace std;
 
 int yyerror(const char *s);
 int yylex();
+// int yywrap();
 int currentNode;
 struct symtab *symupdate(char *s, char *v, int type);
 
