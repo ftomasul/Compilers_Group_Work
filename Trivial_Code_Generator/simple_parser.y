@@ -10,6 +10,9 @@ int yyerror(const char *s);
 int yylex();
 struct symtab *symupdate(char *s, char *v, int type);
 
+char *tree[20];
+int currentNode = 0;
+
 %}
 
 %union {
@@ -29,11 +32,13 @@ struct symtab *symupdate(char *s, char *v, int type);
 %%
 
 program: K_PROGRAM IDENTIFIER code_block {
+    tree[currentNode++] = $2->name;
     symupdate($2->name, $1, 2);
 } 
 ;
 
 function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block {
+    tree[currentNode++] = $3->name;
     symupdate($3->name, $1, 2);
     symupdate($3->name, $2, 1);
 } 
@@ -61,15 +66,28 @@ param: SCONSTANT
 |   %empty { /*empty*/ }
 ;
 
-print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {}
-|   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN {}
-|   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN {}
-|   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN {}
-|   K_PRINT_STRING LPAREN IDENTIFIER RPAREN {}
-|   K_PRINT_STRING LPAREN SCONSTANT RPAREN {}
+print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {
+    tree[currentNode++] = $3->name;
+}
+|   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN {
+    tree[currentNode++] = $3;
+}
+|   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN {
+    tree[currentNode++] = $3->name;
+}
+|   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN {
+    tree[currentNode++] = $3;
+}
+|   K_PRINT_STRING LPAREN IDENTIFIER RPAREN {
+    tree[currentNode++] = $3->name;
+}
+|   K_PRINT_STRING LPAREN SCONSTANT RPAREN {
+    tree[currentNode++] = $3;
+}
 ;
 
-iden_dec :  type IDENTIFIER { 
+iden_dec :  type IDENTIFIER {
+    tree[currentNode++] = $2->name; 
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
@@ -77,36 +95,44 @@ iden_dec :  type IDENTIFIER {
 ;
 
 iden_assign: IDENTIFIER assign_op IDENTIFIER {
+    tree[currentNode++] = $1->name; 
     symupdate($1->name, $3->value, 0);
 }
 |   IDENTIFIER assign_op ICONSTANT {
+    tree[currentNode++] = $1->name; 
     symupdate($1->name, $3, 0);
 }
 |   IDENTIFIER assign_op DCONSTANT {
+    tree[currentNode++] = $1->name; 
     symupdate($1->name, $3, 0);
 }
 |   IDENTIFIER assign_op SCONSTANT {
+    tree[currentNode++] = $1->name; 
     symupdate($1->name, $3, 0);
 }
 |   type IDENTIFIER assign_op IDENTIFIER {
+    tree[currentNode++] = $2->name; 
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
     symupdate($2->name, $4->value, 0);
 }
 |   type IDENTIFIER assign_op ICONSTANT {
+    tree[currentNode++] = $2->name;
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
     symupdate($2->name, $4, 0);
 }
 |   type IDENTIFIER assign_op DCONSTANT {
+    tree[currentNode++] = $2->name;
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
     symupdate($2->name, $4, 0);
 }
 |   type IDENTIFIER assign_op SCONSTANT {
+    tree[currentNode++] = $2->name;
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
@@ -176,7 +202,11 @@ int main(int argc, char* argv[]) {
         } while(!feof(yyin));
         fclose(file);
 
-        int tableIndex = 0;
+        for(int i = 0; i < currentNode; i++) {
+            cout << i << ": " << tree[i] << endl;
+        }
+
+        /* int tableIndex = 0;
         struct symtab *sp;
         cout << endl;
         cout << "*** Printing Symbol Table ***" << endl;
@@ -186,7 +216,7 @@ int main(int argc, char* argv[]) {
                 cout << setw(20) << tableIndex++ << setw(20) << sp->name << setw(20) << sp->token << setw(20) << sp->type << setw(20) << sp->value << endl;
             }
         }
-        cout << endl;
+        cout << endl; */
 
         /* FILE* outFile = fopen("yourmain.h", "w");
 
