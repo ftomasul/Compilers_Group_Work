@@ -1,0 +1,16 @@
+program test {
+    
+    function integer main() {
+        integer a;
+        integer b;
+        integer c;
+        double x;
+        double y;
+        b := 2;
+        c := 3;
+        a := b + c;
+        y := 3.1415;
+        x := y * c;
+        return 0;
+    }
+}
