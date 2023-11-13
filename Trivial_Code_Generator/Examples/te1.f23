@@ -4,6 +4,7 @@ program tiny_example_1
     {
         integer i;
         i := 441;
+        integer d := i;
         print_integer( i );
     }
 }

@@ -8,14 +8,11 @@ using namespace std;
 
 int yyerror(const char *s);
 int yylex();
-// int yywrap();
-int currentNode;
 struct symtab *symupdate(char *s, char *v, int type);
 
 %}
 
 %union {
-    double num;
     char *sym;
     struct symtab *table;
 }
@@ -28,20 +25,17 @@ struct symtab *symupdate(char *s, char *v, int type);
 %nonassoc UMINUS
 
 %type<sym> type
-/* %type<sym> program function_dec arg_list arg function_call param_list param print iden_dec iden_assign type assign_op code_block code line arith_exp */
 
 %%
 
 program: K_PROGRAM IDENTIFIER code_block {
-    struct symtab *sp; 
-    sp = symupdate($2->name, $1, 2);
+    symupdate($2->name, $1, 2);
 } 
 ;
 
 function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block {
-    struct symtab *sp;
-    sp = symupdate($3->name, $1, 2);
-    sp = symupdate($3->name, $2, 1);
+    symupdate($3->name, $1, 2);
+    symupdate($3->name, $2, 1);
 } 
 ;
 
@@ -76,56 +70,47 @@ print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {}
 ;
 
 iden_dec :  type IDENTIFIER { 
-    struct symtab *sp;
     char *token = strdup("identifier");
-    sp = symupdate($2->name, token, 2);
-    sp = symupdate($2->name, $1, 1);
+    symupdate($2->name, token, 2);
+    symupdate($2->name, $1, 1);
 } 
 ;
 
 iden_assign: IDENTIFIER assign_op IDENTIFIER {
-    struct symtab *sp;
-    sp = symupdate($1->name, $3->value, 0);
+    symupdate($1->name, $3->value, 0);
 }
 |   IDENTIFIER assign_op ICONSTANT {
-    struct symtab *sp;
-    sp = symupdate($1->name, $3, 0);
+    symupdate($1->name, $3, 0);
 }
 |   IDENTIFIER assign_op DCONSTANT {
-    struct symtab *sp;
-    sp = symupdate($1->name, $3, 0);
+    symupdate($1->name, $3, 0);
 }
 |   IDENTIFIER assign_op SCONSTANT {
-    struct symtab *sp;
-    sp = symupdate($1->name, $3, 0);
+    symupdate($1->name, $3, 0);
 }
 |   type IDENTIFIER assign_op IDENTIFIER {
-    struct symtab *sp;
     char *token = strdup("identifier");
-    sp = symupdate($2->name, token, 2);
-    sp = symupdate($2->name, $1, 1);
-    sp = symupdate($2->name, $4->value, 0);
+    symupdate($2->name, token, 2);
+    symupdate($2->name, $1, 1);
+    symupdate($2->name, $4->value, 0);
 }
 |   type IDENTIFIER assign_op ICONSTANT {
-    struct symtab *sp;
     char *token = strdup("identifier");
-    sp = symupdate($2->name, token, 2);
-    sp = symupdate($2->name, $1, 1);
-    sp = symupdate($2->name, $4, 0);
+    symupdate($2->name, token, 2);
+    symupdate($2->name, $1, 1);
+    symupdate($2->name, $4, 0);
 }
 |   type IDENTIFIER assign_op DCONSTANT {
-    struct symtab *sp;
     char *token = strdup("identifier");
-    sp = symupdate($2->name, token, 2);
-    sp = symupdate($2->name, $1, 1);
-    sp = symupdate($2->name, $4, 0);
+    symupdate($2->name, token, 2);
+    symupdate($2->name, $1, 1);
+    symupdate($2->name, $4, 0);
 }
 |   type IDENTIFIER assign_op SCONSTANT {
-    struct symtab *sp;
     char *token = strdup("identifier");
-    sp = symupdate($2->name, token, 2);
-    sp = symupdate($2->name, $1, 1);
-    sp = symupdate($2->name, $4, 0);
+    symupdate($2->name, token, 2);
+    symupdate($2->name, $1, 1);
+    symupdate($2->name, $4, 0);
 }
 ;
 
@@ -191,11 +176,23 @@ int main(int argc, char* argv[]) {
         } while(!feof(yyin));
         fclose(file);
 
-        FILE* outFile = fopen("yourmain.h", "w");
+        int tableIndex = 0;
+        struct symtab *sp;
+        cout << endl;
+        cout << "*** Printing Symbol Table ***" << endl;
+        cout << setw(20) << left << "Index" << setw(20) << left << "Name" << setw(20) << left << "Token" << setw(20) << left << "Type" << setw(20) << left << "Value" << endl;
+        for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
+            if(sp->name) {
+                cout << setw(20) << tableIndex++ << setw(20) << sp->name << setw(20) << sp->token << setw(20) << sp->type << setw(20) << sp->value << endl;
+            }
+        }
+        cout << endl;
+
+        /* FILE* outFile = fopen("yourmain.h", "w");
 
         // Generate code
 
-        fclose(outFile);
+        fclose(outFile); */
 
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
