@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iomanip>
+#include <fstream>
 #include "symtab.h"
 using namespace std;
 
@@ -10,7 +11,16 @@ int yyerror(const char *s);
 int yylex();
 struct symtab *symupdate(char *s, char *v, int type);
 
-char *tree[20];
+struct node {
+    char *name;
+    char *action;
+    char *other;
+    int terminal;
+};
+
+int insertNode(struct node tree[], int currentNode, char* name, char* action, char* other, int terminal);
+
+struct node tree[20];
 int currentNode = 0;
 
 %}
@@ -32,13 +42,13 @@ int currentNode = 0;
 %%
 
 program: K_PROGRAM IDENTIFIER code_block {
-    tree[currentNode++] = $2->name;
+    currentNode = insertNode(tree, currentNode, $2->name, strdup("program"), strdup("null"), 0);
     symupdate($2->name, $1, 2);
 } 
 ;
 
 function_dec: K_FUNCTION type IDENTIFIER LPAREN arg_list RPAREN code_block {
-    tree[currentNode++] = $3->name;
+    currentNode = insertNode(tree, currentNode, $3-> name, strdup("function_dec"), strdup("null"), 0);
     symupdate($3->name, $1, 2);
     symupdate($3->name, $2, 1);
 } 
@@ -67,27 +77,27 @@ param: SCONSTANT
 ;
 
 print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {
-    tree[currentNode++] = $3->name;
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
 }
 |   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN {
-    tree[currentNode++] = $3;
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
 }
 |   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN {
-    tree[currentNode++] = $3->name;
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
 }
 |   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN {
-    tree[currentNode++] = $3;
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
 }
 |   K_PRINT_STRING LPAREN IDENTIFIER RPAREN {
-    tree[currentNode++] = $3->name;
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
 }
 |   K_PRINT_STRING LPAREN SCONSTANT RPAREN {
-    tree[currentNode++] = $3;
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
 }
 ;
 
 iden_dec :  type IDENTIFIER {
-    tree[currentNode++] = $2->name; 
+    currentNode = insertNode(tree, currentNode, $2->name, strdup("iden_dec"), strdup("null"), 1);
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
@@ -95,44 +105,44 @@ iden_dec :  type IDENTIFIER {
 ;
 
 iden_assign: IDENTIFIER assign_op IDENTIFIER {
-    tree[currentNode++] = $1->name; 
+    currentNode = insertNode(tree, currentNode, $1->name, strdup("iden_assign"), $3->name, 1);
     symupdate($1->name, $3->value, 0);
 }
 |   IDENTIFIER assign_op ICONSTANT {
-    tree[currentNode++] = $1->name; 
+    currentNode = insertNode(tree, currentNode, $1->name, strdup("iden_assign"), $3, 1);
     symupdate($1->name, $3, 0);
 }
 |   IDENTIFIER assign_op DCONSTANT {
-    tree[currentNode++] = $1->name; 
+    currentNode = insertNode(tree, currentNode, $1->name, strdup("iden_assign"), $3, 1);
     symupdate($1->name, $3, 0);
 }
 |   IDENTIFIER assign_op SCONSTANT {
-    tree[currentNode++] = $1->name; 
+    currentNode = insertNode(tree, currentNode, $1->name, strdup("iden_assign"), $3, 1);
     symupdate($1->name, $3, 0);
 }
 |   type IDENTIFIER assign_op IDENTIFIER {
-    tree[currentNode++] = $2->name; 
+    currentNode = insertNode(tree, currentNode, $2->name, strdup("iden_assign"), $4->name, 1);
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
     symupdate($2->name, $4->value, 0);
 }
 |   type IDENTIFIER assign_op ICONSTANT {
-    tree[currentNode++] = $2->name;
+    currentNode = insertNode(tree, currentNode, $2->name, strdup("iden_assign"), $4, 1);
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
     symupdate($2->name, $4, 0);
 }
 |   type IDENTIFIER assign_op DCONSTANT {
-    tree[currentNode++] = $2->name;
+    currentNode = insertNode(tree, currentNode, $2->name, strdup("iden_assign"), $4, 1);
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
     symupdate($2->name, $4, 0);
 }
 |   type IDENTIFIER assign_op SCONSTANT {
-    tree[currentNode++] = $2->name;
+    currentNode = insertNode(tree, currentNode, $2->name, strdup("iden_assign"), $4, 1);
     char *token = strdup("identifier");
     symupdate($2->name, token, 2);
     symupdate($2->name, $1, 1);
@@ -202,27 +212,19 @@ int main(int argc, char* argv[]) {
         } while(!feof(yyin));
         fclose(file);
 
-        for(int i = 0; i < currentNode; i++) {
-            cout << i << ": " << tree[i] << endl;
-        }
-
-        /* int tableIndex = 0;
-        struct symtab *sp;
         cout << endl;
-        cout << "*** Printing Symbol Table ***" << endl;
-        cout << setw(20) << left << "Index" << setw(20) << left << "Name" << setw(20) << left << "Token" << setw(20) << left << "Type" << setw(20) << left << "Value" << endl;
-        for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
-            if(sp->name) {
-                cout << setw(20) << tableIndex++ << setw(20) << sp->name << setw(20) << sp->token << setw(20) << sp->type << setw(20) << sp->value << endl;
-            }
+        cout << "*** Printing Parse Tree ***" << endl;
+        cout << setw(20) << left << "Node" << setw(20) << left << "Name" << setw(20) << left << "Action" << setw(20) << left <<  "Other" << setw(20) << left << "Terminal" << endl;
+        for(int i = currentNode - 1; i >= 0; i--) {
+            cout << setw(20) << i << setw(20) << tree[i].name << setw(20) << tree[i].action << setw(20) << tree[i].other << setw(20) << tree[i].terminal << endl;
         }
-        cout << endl; */
+        cout << endl;
 
-        /* FILE* outFile = fopen("yourmain.h", "w");
+        ofstream mainFile("yourmain.h");
 
-        // Generate code
-
-        fclose(outFile); */
+        mainFile << "int yourmain()\n{";
+        
+        mainFile << "}";
 
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
@@ -289,4 +291,13 @@ struct symtab *symupdate(char *s, char *v, int type) {
     }
     yyerror("Too many symbols");
     exit(1);
+}
+
+int insertNode(struct node tree[], int currentNode, char *name, char *action, char* other, int terminal) {
+    tree[currentNode].name = name;
+    tree[currentNode].action = action;
+    tree[currentNode].other = other;
+    tree[currentNode].terminal = terminal;
+
+    return currentNode + 1;
 }
