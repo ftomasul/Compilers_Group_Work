@@ -9,6 +9,7 @@ using namespace std;
 
 int yyerror(const char *s);
 int yylex();
+struct symtab *symlook(char *s);
 struct symtab *symupdate(char *s, char *v, int type);
 
 struct node {
@@ -77,22 +78,22 @@ param: SCONSTANT
 ;
 
 print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {
-    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("iden_int"), 1);
 }
 |   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN {
-    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("int"), 1);
 }
 |   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN {
-    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("iden_double"), 1);
 }
 |   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN {
-    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("double"), 1);
 }
 |   K_PRINT_STRING LPAREN IDENTIFIER RPAREN {
-    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("iden_string"), 1);
 }
 |   K_PRINT_STRING LPAREN SCONSTANT RPAREN {
-    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("string"), 1);
 }
 ;
 
@@ -212,19 +213,77 @@ int main(int argc, char* argv[]) {
         } while(!feof(yyin));
         fclose(file);
 
-        cout << endl;
+        /* cout << endl;
         cout << "*** Printing Parse Tree ***" << endl;
         cout << setw(20) << left << "Node" << setw(20) << left << "Name" << setw(20) << left << "Action" << setw(20) << left <<  "Other" << setw(20) << left << "Terminal" << endl;
         for(int i = currentNode - 1; i >= 0; i--) {
             cout << setw(20) << i << setw(20) << tree[i].name << setw(20) << tree[i].action << setw(20) << tree[i].other << setw(20) << tree[i].terminal << endl;
         }
-        cout << endl;
+        cout << endl; */
+
+        int reg = 1;
+        int memory = 1;
 
         ofstream mainFile("yourmain.h");
 
-        mainFile << "int yourmain()\n{";
-        
-        mainFile << "}";
+        mainFile << "int yourmain()\n{\n";
+
+        for(int i = 0; i < currentNode; i++) {
+            if(tree[i].terminal == 1) {
+                if(strcmp(tree[i].action, "print") == 0) {
+                    char *printType = strdup(tree[i].other);
+                    if(strcmp(printType, "int") == 0) {
+                        mainFile << "print_int(" << tree[i].name << ");\n";
+                    } else if(strcmp(printType, "string") == 0) {
+                        mainFile << "print_string(" << tree[i].name << ")\n";
+                    } else if(strcmp(printType, "double") == 0) {
+                        mainFile << "print_double(" << tree[i].name << ")\n";
+                    } else if(strcmp(printType, "iden_int") == 0) {
+                        struct symtab *sp = symlook(tree[i].name);
+                        char *val = sp->value;
+                        mainFile << "print_int(" << val << ");\n";
+                    } else if(strcmp(printType, "iden_string") == 0) {
+                        struct symtab *sp = symlook(tree[i].name);
+                        char *val = sp->value;
+                        mainFile << "print_string(" << val << ");\n";
+                    } else if(strcmp(printType, "iden_double") == 0) {
+                        struct symtab *sp = symlook(tree[i].name);
+                        char *val = sp->value;
+                        mainFile << "print_double(" << val << ");\n";
+                    }
+                } else if(strcmp(tree[i].action, "iden_dec") == 0) {
+                    struct symtab *sp = symlook(tree[i].name);
+                    mainFile << "SR -= 1;\n";
+                    if(strcmp(sp->type, "double") == 0) {
+                        mainFile << "FR = SR;\n";
+                    }
+                } else if(strcmp(tree[i].action, "iden_assign") == 0) {
+                    if(reg == 3) {
+                        reg = 1;
+                    }
+                    char *assign = strdup(tree[i].other);
+                    char *memType;
+                    char *regType;
+                    struct symtab *sp = symlook(tree[i].name);
+                    mainFile <<"R[" << reg << "] = " << assign << ";\n";
+                    if(strcmp(sp->type, "string") == 0) {
+                        memType = strdup("SMem");
+                        regType = strdup("SR");
+                    } else if(strcmp(sp->type, "double") == 0) {
+                        memType = strdup("FMem");
+                        regType = strdup("FR");
+                    } else {
+                        memType = strdup("Mem");
+                        regType = strdup("SR");
+                    }
+                    mainFile << memType << "[" << regType << "+" << memory << "]" << " = " << "R[" << reg << "];\n";
+                    reg++;
+                    memory++;
+                }
+            }
+        }
+
+        mainFile << "return 0;\n}";
 
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
