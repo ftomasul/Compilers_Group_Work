@@ -213,14 +213,6 @@ int main(int argc, char* argv[]) {
         } while(!feof(yyin));
         fclose(file);
 
-        /* cout << endl;
-        cout << "*** Printing Parse Tree ***" << endl;
-        cout << setw(20) << left << "Node" << setw(20) << left << "Name" << setw(20) << left << "Action" << setw(20) << left <<  "Other" << setw(20) << left << "Terminal" << endl;
-        for(int i = currentNode - 1; i >= 0; i--) {
-            cout << setw(20) << i << setw(20) << tree[i].name << setw(20) << tree[i].action << setw(20) << tree[i].other << setw(20) << tree[i].terminal << endl;
-        }
-        cout << endl; */
-
         int reg = 1;
         int memory = 1;
 
