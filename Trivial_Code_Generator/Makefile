@@ -10,10 +10,10 @@ FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=Examples/te1.f23
+FILE=Examples/te2.f23
 
 # Don't need to check for clean
-.PHONY: clean, run
+.PHONY: clean, run, yourmain.h
 
 run: f23
 	${RUN}f23

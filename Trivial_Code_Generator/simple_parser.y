@@ -222,6 +222,7 @@ int main(int argc, char* argv[]) {
 
         for(int i = 0; i < currentNode; i++) {
             if(tree[i].terminal == 1) {
+                struct symtab *sp = symlook(tree[i].name);
                 if(strcmp(tree[i].action, "print") == 0) {
                     char *printType = strdup(tree[i].other);
                     if(strcmp(printType, "int") == 0) {
@@ -231,17 +232,14 @@ int main(int argc, char* argv[]) {
                     } else if(strcmp(printType, "double") == 0) {
                         mainFile << "print_double(" << tree[i].name << ");\n";
                     } else if(strcmp(printType, "iden_int") == 0) {
-                        struct symtab *sp = symlook(tree[i].name);
-                        char *val = sp->value;
-                        mainFile << "print_int(" << val << ");\n";
+                        char *loc = sp->location;
+                        mainFile << "print_int(" << loc << ");\n";
                     } else if(strcmp(printType, "iden_string") == 0) {
-                        struct symtab *sp = symlook(tree[i].name);
-                        char *val = sp->value;
-                        mainFile << "print_string(" << val << ");\n";
+                        char *loc = sp->location;
+                        mainFile << "print_string(" << loc << ");\n";
                     } else if(strcmp(printType, "iden_double") == 0) {
-                        struct symtab *sp = symlook(tree[i].name);
-                        char *val = sp->value;
-                        mainFile << "print_double(" << val << ");\n";
+                        char *loc = sp->location;
+                        mainFile << "print_double(" << loc << ");\n";
                     }
                 } else if(strcmp(tree[i].action, "iden_dec") == 0) {
                     struct symtab *sp = symlook(tree[i].name);
@@ -256,6 +254,9 @@ int main(int argc, char* argv[]) {
                     char *assign = strdup(tree[i].other);
                     char *memType;
                     char *regType;
+                    char *loc;
+                    char memStr[9];
+                    snprintf(memStr, 9, "%d", memory);
                     struct symtab *sp = symlook(tree[i].name);
                     mainFile <<"R[" << reg << "] = " << assign << ";\n";
                     if(strcmp(sp->type, "string") == 0) {
@@ -268,7 +269,14 @@ int main(int argc, char* argv[]) {
                         memType = strdup("Mem");
                         regType = strdup("SR");
                     }
-                    mainFile << memType << "[" << regType << "+" << memory << "]" << " = " << "R[" << reg << "];\n";
+                    loc = strdup(memType);
+                    strcat(loc, "[");
+                    strcat(loc, regType);
+                    strcat(loc, "+");
+                    strcat(loc, memStr);
+                    strcat(loc, "]");
+                    mainFile << loc << " = " << "R[" << reg << "];\n";
+                    symupdate(sp->name, loc, 3);
                     reg++;
                     memory++;
                 }
@@ -276,6 +284,8 @@ int main(int argc, char* argv[]) {
         }
 
         mainFile << "return 0;\n}";
+
+        mainFile.close();
 
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
@@ -304,6 +314,7 @@ struct symtab *symlook(char *s) {
             sp->token = strdup("null");
             sp->type = strdup("null");
             sp->value = strdup("null");
+            sp->location = strdup("null");
             return sp;
         }
     }
@@ -314,8 +325,8 @@ struct symtab *symlook(char *s) {
 struct symtab *symupdate(char *s, char *v, int type) {
     // Function to update an index of the symbol table. s is the
     // name of the index to update, v is the value we are adding
-    // and type is the type of field (value=0, type=1 or token=2) 
-    // we are updating.
+    // and type is the type of field (value=0, type=1, token=2, 
+    // location=3) we are updating.
     struct symtab *sp;
 
     for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
@@ -329,6 +340,9 @@ struct symtab *symupdate(char *s, char *v, int type) {
                 return sp;
             } else if(type == 2) {
                 sp->token = strdup(v);
+                return sp;
+            } else if(type == 3) {
+                sp->location = strdup(v);
                 return sp;
             } else {
                 yyerror("Update: invalid type being added");
