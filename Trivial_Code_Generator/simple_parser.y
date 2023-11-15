@@ -235,9 +235,9 @@ int main(int argc, char* argv[]) {
                     if(strcmp(printType, "int") == 0) {
                         mainFile << "print_int(" << tree[i].name << ");\n";
                     } else if(strcmp(printType, "string") == 0) {
-                        mainFile << "print_string(" << tree[i].name << ")\n";
+                        mainFile << "print_string(" << tree[i].name << ");\n";
                     } else if(strcmp(printType, "double") == 0) {
-                        mainFile << "print_double(" << tree[i].name << ")\n";
+                        mainFile << "print_double(" << tree[i].name << ");\n";
                     } else if(strcmp(printType, "iden_int") == 0) {
                         struct symtab *sp = symlook(tree[i].name);
                         char *val = sp->value;
