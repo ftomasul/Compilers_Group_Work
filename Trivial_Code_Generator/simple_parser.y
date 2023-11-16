@@ -237,9 +237,7 @@ int main(int argc, char* argv[]) {
                         mainFile << "FR = SR;\n";
                     }
                 } else if(strcmp(tree[i].action, "iden_assign") == 0) {
-                    if(reg == 3) {
-                        reg = 1;
-                    }
+                    if(reg == 3) {reg = 1;}
                     char *assign = strdup(tree[i].other);
                     struct symtab *sp = symlook(tree[i].name);
                     const char *memType = (strcmp(sp->type, "string") == 0) ? "SMem" : ((strcmp(sp->type, "double") == 0) ? "FMem" : "Mem");
