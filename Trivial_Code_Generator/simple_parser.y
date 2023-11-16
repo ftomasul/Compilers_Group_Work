@@ -228,46 +228,26 @@ int main(int argc, char* argv[]) {
                     const char *Type = (strcmp(printType, "int") == 0 || strcmp(printType, "iden_int") == 0) ? "int" : 
                                       (strcmp(printType, "string") == 0 || strcmp(printType, "iden_string") == 0) ? "string" : 
                                       "double";
-
                     if(strcmp(printType, Type) == 0){mainFile << "print_" << Type << "(" << tree[i].name << ");\n";}
                     else{mainFile << "print_" << Type << "(" << sp->location << ");\n";}
-
                 } else if(strcmp(tree[i].action, "iden_dec") == 0) {
                     struct symtab *sp = symlook(tree[i].name);
                     mainFile << "SR -= 1;\n";
                     if(strcmp(sp->type, "double") == 0) {
                         mainFile << "FR = SR;\n";
                     }
-                    
                 } else if(strcmp(tree[i].action, "iden_assign") == 0) {
                     if(reg == 3) {
                         reg = 1;
                     }
                     char *assign = strdup(tree[i].other);
-                    char *memType;
-                    char *regType;
-                    char *loc;
-                    char memStr[9];
-                    snprintf(memStr, 9, "%d", memory);
                     struct symtab *sp = symlook(tree[i].name);
-                    mainFile <<"R[" << reg << "] = " << assign << ";\n";
-                    if(strcmp(sp->type, "string") == 0) {
-                        memType = strdup("SMem");
-                        regType = strdup("SR");
-                    } else if(strcmp(sp->type, "double") == 0) {
-                        memType = strdup("FMem");
-                        regType = strdup("FR");
-                    } else {
-                        memType = strdup("Mem");
-                        regType = strdup("SR");
-                    }
-                    loc = strdup(memType);
-                    strcat(loc, "[");
-                    strcat(loc, regType);
-                    strcat(loc, "+");
-                    strcat(loc, memStr);
-                    strcat(loc, "]");
-                    mainFile << loc << " = " << "R[" << reg << "];\n";
+                    const char *memType = (strcmp(sp->type, "string") == 0) ? "SMem" : ((strcmp(sp->type, "double") == 0) ? "FMem" : "Mem");
+                    const char *regType = (strcmp(sp->type, "double") == 0) ? "FR" : "SR";
+                    int locSize = strlen(memType) + strlen(regType) + 10;
+                    char loc[locSize];
+                    snprintf(loc, locSize, "%s[%s+%d]", memType, regType, memory);
+                    mainFile <<"R[" << reg << "] = " << assign << ";\n" << loc << " = " << "R[" << reg << "];\n";
                     symupdate(sp->name, loc, 3);
                     reg++;
                     memory++;
