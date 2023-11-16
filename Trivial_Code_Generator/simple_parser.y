@@ -9,6 +9,7 @@ using namespace std;
 
 int yyerror(const char *s);
 int yylex();
+struct symtab *symlook(char *s);
 struct symtab *symupdate(char *s, char *v, int type);
 
 struct node {
@@ -77,22 +78,22 @@ param: SCONSTANT
 ;
 
 print: K_PRINT_INTEGER LPAREN IDENTIFIER RPAREN {
-    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("iden_int"), 1);
 }
 |   K_PRINT_INTEGER LPAREN ICONSTANT RPAREN {
-    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("int"), 1);
 }
 |   K_PRINT_DOUBLE LPAREN IDENTIFIER RPAREN {
-    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("iden_double"), 1);
 }
 |   K_PRINT_DOUBLE LPAREN DCONSTANT RPAREN {
-    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("double"), 1);
 }
 |   K_PRINT_STRING LPAREN IDENTIFIER RPAREN {
-    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3->name, strdup("print"), strdup("iden_string"), 1);
 }
 |   K_PRINT_STRING LPAREN SCONSTANT RPAREN {
-    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("null"), 1);
+    currentNode = insertNode(tree, currentNode, $3, strdup("print"), strdup("string"), 1);
 }
 ;
 
@@ -212,19 +213,71 @@ int main(int argc, char* argv[]) {
         } while(!feof(yyin));
         fclose(file);
 
-        cout << endl;
-        cout << "*** Printing Parse Tree ***" << endl;
-        cout << setw(20) << left << "Node" << setw(20) << left << "Name" << setw(20) << left << "Action" << setw(20) << left <<  "Other" << setw(20) << left << "Terminal" << endl;
-        for(int i = currentNode - 1; i >= 0; i--) {
-            cout << setw(20) << i << setw(20) << tree[i].name << setw(20) << tree[i].action << setw(20) << tree[i].other << setw(20) << tree[i].terminal << endl;
-        }
-        cout << endl;
+        int reg = 1;
+        int memory = 1;
 
         ofstream mainFile("yourmain.h");
 
-        mainFile << "int yourmain()\n{";
-        
-        mainFile << "}";
+        mainFile << "int yourmain()\n{\n";
+
+        for(int i = 0; i < currentNode; i++) {
+            if(tree[i].terminal == 1) {
+                struct symtab *sp = symlook(tree[i].name);
+                if(strcmp(tree[i].action, "print") == 0) {
+                    char *printType = strdup(tree[i].other);
+                    const char *Type = (strcmp(printType, "int") == 0 || strcmp(printType, "iden_int") == 0) ? "int" : 
+                                      (strcmp(printType, "string") == 0 || strcmp(printType, "iden_string") == 0) ? "string" : 
+                                      "double";
+
+                    if(strcmp(printType, Type) == 0){mainFile << "print_" << Type << "(" << tree[i].name << ");\n";}
+                    else{mainFile << "print_" << Type << "(" << sp->location << ");\n";}
+
+                } else if(strcmp(tree[i].action, "iden_dec") == 0) {
+                    struct symtab *sp = symlook(tree[i].name);
+                    mainFile << "SR -= 1;\n";
+                    if(strcmp(sp->type, "double") == 0) {
+                        mainFile << "FR = SR;\n";
+                    }
+                    
+                } else if(strcmp(tree[i].action, "iden_assign") == 0) {
+                    if(reg == 3) {
+                        reg = 1;
+                    }
+                    char *assign = strdup(tree[i].other);
+                    char *memType;
+                    char *regType;
+                    char *loc;
+                    char memStr[9];
+                    snprintf(memStr, 9, "%d", memory);
+                    struct symtab *sp = symlook(tree[i].name);
+                    mainFile <<"R[" << reg << "] = " << assign << ";\n";
+                    if(strcmp(sp->type, "string") == 0) {
+                        memType = strdup("SMem");
+                        regType = strdup("SR");
+                    } else if(strcmp(sp->type, "double") == 0) {
+                        memType = strdup("FMem");
+                        regType = strdup("FR");
+                    } else {
+                        memType = strdup("Mem");
+                        regType = strdup("SR");
+                    }
+                    loc = strdup(memType);
+                    strcat(loc, "[");
+                    strcat(loc, regType);
+                    strcat(loc, "+");
+                    strcat(loc, memStr);
+                    strcat(loc, "]");
+                    mainFile << loc << " = " << "R[" << reg << "];\n";
+                    symupdate(sp->name, loc, 3);
+                    reg++;
+                    memory++;
+                }
+            }
+        }
+
+        mainFile << "return 0;\n}";
+
+        mainFile.close();
 
     } else {
         cout << "Please use a single file as an argument to the parser" << endl;
@@ -253,6 +306,7 @@ struct symtab *symlook(char *s) {
             sp->token = strdup("null");
             sp->type = strdup("null");
             sp->value = strdup("null");
+            sp->location = strdup("null");
             return sp;
         }
     }
@@ -263,8 +317,8 @@ struct symtab *symlook(char *s) {
 struct symtab *symupdate(char *s, char *v, int type) {
     // Function to update an index of the symbol table. s is the
     // name of the index to update, v is the value we are adding
-    // and type is the type of field (value=0, type=1 or token=2) 
-    // we are updating.
+    // and type is the type of field (value=0, type=1, token=2, 
+    // location=3) we are updating.
     struct symtab *sp;
 
     for(sp = symtab; sp < &symtab[NSYMS]; sp++) {
@@ -278,6 +332,9 @@ struct symtab *symupdate(char *s, char *v, int type) {
                 return sp;
             } else if(type == 2) {
                 sp->token = strdup(v);
+                return sp;
+            } else if(type == 3) {
+                sp->location = strdup(v);
                 return sp;
             } else {
                 yyerror("Update: invalid type being added");
