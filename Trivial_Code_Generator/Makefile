@@ -4,31 +4,38 @@
 # Makefile to compile and run our simple parser
 
 # Variables
+CC=gcc
 CXX=g++
 FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=Examples/te2.f23
+FILE=te1.f23
 
 # Don't need to check for clean
-.PHONY: clean, run
+.PHONY: clean, run, yourmain.h
 
-run: symtab
-	${RUN}symtab ${FILE}
+run: f23
+	${RUN}f23
+
+yourmain.h: generator
+	${RUN}generator ${FILE}
 
 # Compile lex into executable
-symtab: y.tab.c lex.yy.c 
-	${CXX} -o symtab simple_parser.tab.c lex.yy.c
+generator: simple_parser.tab.c lex.yy.c 
+	${CXX} -o generator simple_parser.tab.c lex.yy.c
 
 # Run yacc on parser
-y.tab.c: simple_parser.y
+simple_parser.tab.c: simple_parser.y
 	${YACC} -d -t simple_parser.y
 
 # Run flex on lexer
 lex.yy.c: lexer.l
 	${FLEX} lexer.l
 
+f23: f23.c yourmain.h
+	${CC} -o f23 f23.c -lm
+
 # Removes all created files
 clean:
-	${RM} simple_parser.tab.c simple_parser.tab.h lex.yy.c symtab yourmain.h
+	${RM} simple_parser.tab.c simple_parser.tab.h lex.yy.c generator yourmain.h f23

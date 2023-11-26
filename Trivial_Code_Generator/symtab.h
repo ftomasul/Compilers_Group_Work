@@ -6,4 +6,5 @@ struct symtab
     char* token;
     char* type;
     char* value;
+    char* location;
 } symtab[NSYMS];

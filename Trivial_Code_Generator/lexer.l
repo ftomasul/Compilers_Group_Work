@@ -5,7 +5,6 @@
 #include "simple_parser.tab.h"
 using namespace std;
 
-// int yywrap();
 struct symtab *symlook(char *s);
 
 %}
