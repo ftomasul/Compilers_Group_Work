@@ -16,6 +16,8 @@ extern FILE *yyin;
 %left PLUS MINUS
 %left MULTIPLY DIVIDE
 %left ASSIGN
+%right NOT
+%nonassoc DAND DOR DEQ GEQ GT LEQ LT NE  
 
 %%
 
@@ -61,16 +63,31 @@ const: ICONSTANT
 |   SCONSTANT
 ;
 
-expr: iden ASSIGN expr 
-|   expr PLUS expr
+arith: expr PLUS expr
 |   expr MINUS expr
 |   expr MULTIPLY expr
 |   expr DIVIDE expr
 |   LPAREN expr RPAREN
+;
+
+bool: expr DAND expr
+|   expr DOR expr
+|   expr DEQ expr
+|   expr GT expr
+|   expr LEQ expr
+|   expr LT expr
+|   expr NE expr
+|   NOT expr
+;
+
+expr: arith
+|   bool
+|   iden ASSIGN expr
 |   iden LPAREN call_args RPAREN
 |   iden
 |   const
 ;
+
 
 call_args: /*blank*/
 |   expr

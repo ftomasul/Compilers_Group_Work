@@ -1,4 +1,4 @@
 program test {
-    
-    a + b;
+
+    a := ( 3 * i ) / 2.0d0;
 }
