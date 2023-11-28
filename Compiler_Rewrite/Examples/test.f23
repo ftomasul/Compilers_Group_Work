@@ -1,1 +1,4 @@
-a -4;
+program test {
+    
+    a + b;
+}
