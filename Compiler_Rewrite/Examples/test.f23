@@ -1,1 +1,6 @@
-a -4;
+program test {
+
+    while(1 > a) {
+        a := 1;
+    }
+}

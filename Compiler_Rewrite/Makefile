@@ -1,6 +1,7 @@
 # Variables
 CXX=g++
 FLEX=flex
+YACC=bison
 RUN=./
 RM=/bin/rm -f
 FILE=Examples/test.f23
@@ -8,17 +9,21 @@ FILE=Examples/test.f23
 # Don't need to check for clean
 .PHONY: clean, run
 
-run: lexer
-	${RUN}lexer ${FILE}
+run: parser
+	${RUN}parser ${FILE}
 
 # Compile lex into executable
-lexer: lex.yy.c 
-	${CXX} lex.yy.c -o lexer
+parser: parser.tab.c lex.yy.c 
+	${CXX} -o parser parser.tab.c lex.yy.c
+
+# Run yacc on parser
+parser.tab.c: parser.y
+	${YACC} -d -t parser.y
 
 # Run flex on lexer
 lex.yy.c: lexer.l
-	${FLEX} lexer.l 
+	${FLEX} lexer.l
 
 # Removes all created files
 clean:
-	${RM} lex.yy.c lexer
+	${RM} parser.tab.c parser.tab.h lex.yy.c parser
