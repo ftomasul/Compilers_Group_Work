@@ -1,4 +1,6 @@
 program test {
 
-    a := ( 3 * i ) / 2.0d0;
+    while(1 > a) {
+        a := 1;
+    }
 }

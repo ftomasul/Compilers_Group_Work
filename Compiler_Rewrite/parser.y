@@ -34,6 +34,8 @@ stmts: stmt
 
 stmt: var_dec SEMI
 |   fun_dec
+|   do_loop
+|   while_loop
 |   proc_dec
 |   expr SEMI
 |   COMMENT
@@ -58,6 +60,7 @@ fun_dec_args: /*blank*/
 iden: IDENTIFIER
 ;
 
+
 const: ICONSTANT
 |   DCONSTANT
 |   SCONSTANT
@@ -75,6 +78,7 @@ bool: expr DAND expr
 |   expr DEQ expr
 |   expr GT expr
 |   expr LEQ expr
+|   expr GEQ expr
 |   expr LT expr
 |   expr NE expr
 |   NOT expr
@@ -105,6 +109,14 @@ print: K_PRINT_INTEGER LPAREN iden RPAREN
 |   K_PRINT_DOUBLE LPAREN const RPAREN
 |   K_PRINT_STRING LPAREN iden RPAREN
 |   K_PRINT_STRING LPAREN const RPAREN
+;
+
+do_loop: K_DO LPAREN bool RPAREN block
+|   K_DO LPAREN bool RPAREN stmt
+;
+
+while_loop: K_WHILE LPAREN bool RPAREN block
+|   K_WHILE LPAREN bool RPAREN stmt
 ;
 
 %%
