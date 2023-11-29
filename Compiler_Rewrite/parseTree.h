@@ -8,7 +8,6 @@ struct parseTree
     char* action;
     int index;
     struct parseTree *left;
-    struct parseTree *mid;
     struct parseTree *right;
 };
 
@@ -25,8 +24,8 @@ parseTree *insert(char *newName, char *newAction, int newIndex, parseTree *newLe
 
 void printTree(parseTree* root, int indent = 0) {
     if (root != NULL) {
-        printTree(root->right, indent + 4);
-        cout << string(indent, ' ') << root->name << endl;
-        printTree(root->left, indent + 4);
+        printTree(root->right, indent + 2);
+        cout << string(indent, ' ') <<  "**Node " << root->index <<  ": " << "action: " << root->action << " | " << "name: " << root->name << endl;
+        printTree(root->left, indent + 2);
     }
 }
