@@ -10,7 +10,6 @@ using namespace std;
 do { yylval.sym = strdup(yytext); return K_DO; }
 double { yylval.sym = strdup(yytext); return K_DOUBLE; }
 else { yylval.sym = strdup(yytext); return K_ELSE; }
-exit { yylval.sym = strdup(yytext); return K_EXIT; }
 function { yylval.sym = strdup(yytext); return K_FUNCTION; }
 if { yylval.sym = strdup(yytext); return K_IF; }
 integer { yylval.sym = strdup(yytext); return K_INTEGER; }
@@ -35,7 +34,7 @@ while { yylval.sym = strdup(yytext); return K_WHILE; }
 \/= { yylval.sym = strdup(yytext); return ASSIGN_DIVIDE; }
 %= { yylval.sym = strdup(yytext); return ASSIGN_MOD; }
 , { yylval.sym = strdup(yytext); return COMMA; }
-\/\/[^\n]* { yylval.sym = strdup(yytext); return COMMENT; }
+\/\/[^\n]* { /* ignore comments */ }
 && { yylval.sym = strdup(yytext); return DAND; }
 \/ { yylval.sym = strdup(yytext); return DIVIDE; }
 \|\| { yylval.sym = strdup(yytext); return DOR; }
@@ -53,7 +52,6 @@ while { yylval.sym = strdup(yytext); return K_WHILE; }
 \* { yylval.sym = strdup(yytext); return MULTIPLY; }
 != { yylval.sym = strdup(yytext); return NE; }
 ! { yylval.sym = strdup(yytext); return NOT; }
-\. { yylval.sym = strdup(yytext); return PERIOD; }
 \+ { yylval.sym = strdup(yytext); return PLUS; }
 \+\+ { yylval.sym = strdup(yytext); return INCREMENT; }
 ] { yylval.sym = strdup(yytext); return RBRACKET; }

@@ -1,4 +1,13 @@
 program test {
 
-    integer i := 2;
+    if(i < 0) then {
+        print_integer(i);
+    } 
+    else if(i == 0) then {
+        read_integer(i);
+    }
+
+    if(d > 0) then 
+        print_double(d);
+
 }
