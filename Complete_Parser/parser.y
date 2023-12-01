@@ -27,9 +27,10 @@ int currentNode = 0;
 %right NOT
 %left DAND DOR DEQ GEQ GT LEQ LT NE
 %right K_THEN
-%left K_ELSE  
+%left K_ELSE
+%nonassoc UMINUS  
 
-%type<node> program block stmts stmt var_dec fun_dec proc_dec fun_dec_args iden const arith bool expr call_args type print do_loop while_loop var_assign do_bool cond_block array dec return_stmt read assign_op if_stmt else_stmt
+%type<node> program block stmts stmt var_dec fun_dec proc_dec fun_dec_args iden const arith bool expr call_args type print do_loop while_loop var_assign do_bool cond_block array dec return_stmt read assign_op if_stmt else_stmt var_dec_list
 
 %%
 
@@ -57,16 +58,26 @@ stmt: var_dec SEMI { $$ = $1; }
 |   if_stmt { $$ = $1; }
 ;
 
-var_dec: type dec { tree = insert($2->name, strdup("var_dec"), currentNode++, $1, $2); $$ = tree; }
+var_dec: type dec var_dec_list { tree = insert($2->name, strdup("var_dec"), currentNode++, $1, $2); $$ = tree; }
+|   type dec assign_op expr var_dec_list { $$ = tree; }
 ;
+
+var_dec_list: %empty { $$ = NULL; }
+|   COMMA dec var_dec_list { tree = insert($2->name, strdup("var_dec"), currentNode++, NULL, $2); $$ = tree; }
+;
+
 
 dec: iden { $$ = $1; }
 |   array { $$ = $1; }
 ;
 
 var_assign: dec assign_op expr { tree = insert($1->name, strdup("var_assign"), currentNode++, $1, $3); $$ = tree; }
+|   dec assign_op var_assign { tree = insert($1->name, strdup("var_assign"), currentNode++, $1, $3); $$ = tree; }
 |   var_dec assign_op expr { tree = insert(strdup("NULL"), strdup("var_assign"), currentNode++, $1, $3); $$ = tree; }
+|   var_dec assign_op var_assign { tree = insert(strdup("NULL"), strdup("var_assign"), currentNode++, $1, $3); $$ = tree; }
+|   var_dec COMMA var_assign { tree = insert(strdup("NULL"), strdup("var_assign"), currentNode++, $1, $3); $$ = tree; }
 ;
+
 
 assign_op: ASSIGN { tree = insert(strdup("NULL"), strdup(":="), currentNode++, NULL, NULL); $$ = tree; }
 |   ASSIGN_PLUS { tree = insert(strdup("NULL"), strdup("+="), currentNode++, NULL, NULL); $$ = tree; }
@@ -89,8 +100,8 @@ proc_dec: K_PROCEDURE iden LPAREN fun_dec_args RPAREN block {
 ;
 
 fun_dec_args: %empty { $$ = NULL; }
-|   var_dec { $$ = $1; }
-|   fun_dec_args COMMA var_dec { tree = insert(strdup("NULL"), strdup("FunDecArgs"), currentNode++, $1, $3); $$ = tree; }
+|   type dec { $$ = $1; }
+|   fun_dec_args COMMA type dec { tree = insert(strdup("NULL"), strdup("FunDecArgs"), currentNode++, $1, $3); $$ = tree; }
 ;
 
 iden: IDENTIFIER { tree = insert($1, strdup("Iden"), currentNode++, NULL, NULL); $$ = tree; }
@@ -109,6 +120,7 @@ arith: expr PLUS expr { tree = insert(strdup("NULL"), strdup("+"), currentNode++
 |   LPAREN expr RPAREN { $$ = $2; }
 |   expr INCREMENT { tree = insert(strdup("NULL"), strdup("++"), currentNode++, $1, NULL); $$ = tree; }
 |   expr DECREMENT { tree = insert(strdup("NULL"), strdup("--"), currentNode++, $1, NULL); $$ = tree; }
+|   MINUS expr %prec UMINUS { tree = insert(strdup("NULL"), strdup("-"), currentNode++, $2, NULL); $$ = tree; }
 ;
 
 bool: expr DAND expr { tree = insert(strdup("NULL"), strdup("&&"),currentNode++, $1, $3); $$ = tree; }
@@ -163,7 +175,7 @@ do_loop: K_DO LPAREN do_bool RPAREN cond_block { tree = insert(strdup("NULL"), s
 do_bool: var_assign SEMI bool SEMI arith { tree = insert(strdup("NULL"), strdup("DoBool"), currentNode++, $1, $3); $$ = tree; }
 ;
 
-while_loop: K_WHILE LPAREN bool RPAREN cond_block { tree = insert(strdup("NULL"), strdup("WhileLoop"), currentNode++, $3, $5); $$ = tree; }
+while_loop: K_WHILE LPAREN expr RPAREN cond_block { tree = insert(strdup("NULL"), strdup("WhileLoop"), currentNode++, $3, $5); $$ = tree; }
 ;
 
 array: iden LBRACKET RBRACKET { tree = insert($1->name, strdup("array"), currentNode++, $1, NULL); $$ = tree; }
@@ -171,9 +183,10 @@ array: iden LBRACKET RBRACKET { tree = insert($1->name, strdup("array"), current
 ;
 
 return_stmt: K_RETURN expr { tree = insert(strdup("NULL"), strdup("return"), currentNode++, $2, NULL); $$ = tree; }
+|   K_RETURN var_assign { tree = insert(strdup("NULL"), strdup("return"), currentNode++, $2, NULL); $$ = tree; }
 ;
 
-if_stmt: K_IF LPAREN bool RPAREN K_THEN cond_block else_stmt { 
+if_stmt: K_IF LPAREN expr RPAREN K_THEN cond_block else_stmt { 
         tree = insert(strdup("NULL"), strdup("if_stmt"), currentNode++, $3, $6); 
         $$ = tree; 
     }
