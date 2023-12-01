@@ -1,0 +1,27 @@
+program gilbert2
+{
+	procedure print_four(string s)
+	{
+		print_string(s);
+		print_string(s);
+		print_string(s);
+        print_string(s);
+	}
+	
+	function integer main()
+	{
+		string quote;
+		quote := "never give up";
+		print_four(quote);
+
+		string quotes[];
+		integer i := 0;
+		while(i < 4)
+		{
+			quotes[i] := quote;
+			print_string(quotes[i]);
+			i++;
+		}
+		return 0;
+	}
+}

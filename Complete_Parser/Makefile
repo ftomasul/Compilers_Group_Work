@@ -1,10 +1,15 @@
+# COSC-4785
+# Complete Parser Assignemt 
+# Finn Tomasula Martin and Edward Gilbert
+# Makefile to compile and run our complete parser
+
 # Variables
 CXX=g++
 FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=Examples/mg.f23
+FILE=Examples/TomasulaMartin.f23
 
 # Don't need to check for clean
 .PHONY: clean, run
