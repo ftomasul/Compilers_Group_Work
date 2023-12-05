@@ -1,0 +1,24 @@
+program TomasulaMartin {
+
+    function double print_name(string name) {
+        print_string(name);
+
+        return name;
+    }
+
+    procedure print_nums(integer n) {
+        integer i;
+        do(i := n; i > 0; i--) {
+            print_integer(i);
+        }
+    }
+
+    function integer main() {
+        string name := "Finn";
+        print_name(name);
+        print_nums(10);
+
+        return 0;
+    }
+
+}
