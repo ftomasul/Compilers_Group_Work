@@ -1,0 +1,70 @@
+bison -d -t parser.y
+parser.y: warning: 10 shift/reduce conflicts [-Wconflicts-sr]
+parser.y: note: rerun with option '-Wcounterexamples' to generate conflict counterexamples
+flex lexer.l
+g++ -o parser parser.tab.c lex.yy.c
+./parser Gilbert2.f23
+
+++++++++++++++++++++++++++++++++++++++++++++++++
++ Walking Through the Parse Tree Begins Here
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+**Node 64: action: program | name: gilbert2
+        **Node 60: action: return | name: NULL
+          **Node 59: action: IntConstant | name: 0
+      **Node 61: action: stmts | name: NULL
+              **Node 55: action: ++ | name: NULL
+                **Node 54: action: Iden | name: i
+            **Node 56: action: stmts | name: NULL
+                **Node 52: action: Print | name: quotes
+                    **Node 50: action: Iden | name: i
+                  **Node 51: action: array | name: quotes
+                    **Node 49: action: Iden | name: quotes
+              **Node 53: action: stmts | name: NULL
+                  **Node 47: action: Iden | name: quote
+                **Node 48: action: var_assign | name: quotes
+                    **Node 44: action: Iden | name: i
+                  **Node 45: action: array | name: quotes
+                    **Node 43: action: Iden | name: quotes
+          **Node 57: action: WhileLoop | name: NULL
+              **Node 41: action: IntConstant | name: 4
+            **Node 42: action: < | name: NULL
+              **Node 40: action: Iden | name: i
+        **Node 58: action: stmts | name: NULL
+            **Node 38: action: IntConstant | name: 0
+          **Node 39: action: stmts | name: NULL
+                **Node 32: action: array | name: quotes
+                  **Node 31: action: Iden | name: quotes
+              **Node 33: action: var_dec | name: quotes
+                **Node 30: action: String | name: NULL
+            **Node 34: action: stmts | name: NULL
+                  **Node 27: action: Iden | name: quote
+                **Node 28: action: FunctionCall | name: print_four
+                  **Node 26: action: Iden | name: print_four
+              **Node 29: action: stmts | name: NULL
+                    **Node 23: action: StringConstant | name: "never give up"
+                  **Node 24: action: var_assign | name: quote
+                    **Node 21: action: Iden | name: quote
+                **Node 25: action: stmts | name: NULL
+                    **Node 19: action: Iden | name: quote
+                  **Node 20: action: var_dec | name: quote
+                    **Node 18: action: String | name: NULL
+    **Node 62: action: fun_dec | name: main
+      **Node 16: action: Integer | name: NULL
+  **Node 63: action: stmts | name: NULL
+        **Node 13: action: Print | name: s
+          **Node 12: action: Iden | name: s
+      **Node 14: action: stmts | name: NULL
+          **Node 10: action: Print | name: s
+            **Node 9: action: Iden | name: s
+        **Node 11: action: stmts | name: NULL
+            **Node 7: action: Print | name: s
+              **Node 6: action: Iden | name: s
+          **Node 8: action: stmts | name: NULL
+            **Node 5: action: Print | name: s
+              **Node 4: action: Iden | name: s
+    **Node 15: action: proc_dec | name: print_four
+
+++++++++++++++++++++++++++++++++++++++++++++++++
++ Done Walking Through Parse Tree
+++++++++++++++++++++++++++++++++++++++++++++++++

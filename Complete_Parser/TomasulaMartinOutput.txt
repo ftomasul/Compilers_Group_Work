@@ -1,0 +1,54 @@
+bison -d -t parser.y
+parser.y: warning: 10 shift/reduce conflicts [-Wconflicts-sr]
+parser.y: note: rerun with option '-Wcounterexamples' to generate conflict counterexamples
+flex lexer.l
+g++ -o parser parser.tab.c lex.yy.c
+./parser TomasulaMartin.f23
+
+++++++++++++++++++++++++++++++++++++++++++++++++
++ Walking Through the Parse Tree Begins Here
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+**Node 52: action: program | name: TomasulaMartin
+        **Node 48: action: return | name: NULL
+          **Node 47: action: IntConstant | name: 0
+      **Node 49: action: stmts | name: NULL
+            **Node 44: action: IntConstant | name: 10
+          **Node 45: action: FunctionCall | name: print_nums
+            **Node 43: action: Iden | name: print_nums
+        **Node 46: action: stmts | name: NULL
+              **Node 40: action: Iden | name: name
+            **Node 41: action: FunctionCall | name: print_name
+              **Node 39: action: Iden | name: print_name
+          **Node 42: action: stmts | name: NULL
+            **Node 38: action: StringConstant | name: "Finn"
+    **Node 50: action: fun_dec | name: main
+      **Node 33: action: Integer | name: NULL
+  **Node 51: action: stmts | name: NULL
+            **Node 28: action: Print | name: i
+              **Node 27: action: Iden | name: i
+          **Node 29: action: DoLoop | name: NULL
+                **Node 22: action: IntConstant | name: 0
+              **Node 23: action: > | name: NULL
+                **Node 21: action: Iden | name: i
+            **Node 26: action: DoBool | name: NULL
+                **Node 19: action: Iden | name: n
+              **Node 20: action: var_assign | name: i
+                **Node 17: action: Iden | name: i
+        **Node 30: action: stmts | name: NULL
+            **Node 15: action: Iden | name: i
+          **Node 16: action: var_dec | name: i
+            **Node 14: action: Integer | name: NULL
+      **Node 31: action: proc_dec | name: print_nums
+    **Node 32: action: stmts | name: NULL
+          **Node 8: action: return | name: NULL
+            **Node 7: action: Iden | name: name
+        **Node 9: action: stmts | name: NULL
+          **Node 6: action: Print | name: name
+            **Node 5: action: Iden | name: name
+      **Node 10: action: fun_dec | name: print_name
+        **Node 1: action: Double | name: NULL
+
+++++++++++++++++++++++++++++++++++++++++++++++++
++ Done Walking Through Parse Tree
+++++++++++++++++++++++++++++++++++++++++++++++++
