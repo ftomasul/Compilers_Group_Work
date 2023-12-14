@@ -20,6 +20,7 @@ struct symtab *table;
 %union {
     struct parseTree *node;
     char* sym;
+    double val;
 }
 
 %token<sym> K_DO K_DOUBLE K_ELSE K_FUNCTION K_IF K_INTEGER K_PRINT_DOUBLE K_PRINT_INTEGER K_PRINT_STRING K_PROCEDURE K_PROGRAM K_READ_DOUBLE K_READ_INTEGER K_READ_STRING K_RETURN K_STRING K_THEN K_WHILE ASSIGN ASSIGN_PLUS ASSIGN_MINUS ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MOD COMMA  DAND DIVIDE DOR DEQ GEQ GT LBRACKET LEQ LCURLY LPAREN LT MINUS DECREMENT MOD MULTIPLY NE NOT PLUS INCREMENT RBRACKET RCURLY RPAREN SEMI IDENTIFIER ICONSTANT DCONSTANT SCONSTANT
@@ -36,6 +37,7 @@ struct symtab *table;
 %nonassoc UMINUS  
 
 %type<node> program block stmts stmt var_dec fun_dec proc_dec fun_dec_args const arith bool expr call_args type print do_loop while_loop var_assign do_bool cond_block return_stmt read assign_op if_stmt else_stmt var_dec_list iden array dec
+
 
 %%
 
@@ -272,13 +274,12 @@ int main(int argc, char* argv[]) {
 }
 
 void generate(parseTree *node, struct symtab *tab, int currReg, int currMem) {
-    if(node != NULL) {
-        if(strcmp(node->action, "var_dec")) {
+    if (node != NULL) {
+        if (strcmp(node->action, "var_dec") == 0) {
             mainFile << "SR -= 1;\n";
-        }
-        else if(strcmp(node->action, "var_assign")) {
+        } else if (strcmp(node->action, "var_assign") == 0) {
             struct symtab *sp = symlook(node->name);
-            if(currReg > 2) {
+            if (currReg > 2) {
                 currReg = 0;
             }
             char* mem = strdup("Mem[SR-");
@@ -295,11 +296,46 @@ void generate(parseTree *node, struct symtab *tab, int currReg, int currMem) {
             strcat(mem, "]");
 
             tab = symupdate(node->name, mem, 3);
+
+        } else if (strcmp(node->action, "FunctionCall") == 0) {
+            int numArgs = 0;
+            parseTree *argNode = node->right;
+            while (argNode != NULL) {
+                generate(argNode->left, tab, currReg, currMem);
+                numArgs++;
+                argNode = argNode->right;
+            }
+
+            mainFile << "R[0] = " << node->name << "(";
+            for (int i = 0; i < numArgs; ++i) {
+                if (i > 0) {
+                    mainFile << ", ";
+                }
+                mainFile << "Mem[SR + " << i << "]";
+            }
+            mainFile << ");\n";
+            mainFile << "SR += " << numArgs << ";\n";
+        } else if (strcmp(node->action, "IfStmt") == 0) {
+            generate(node->left, tab, currReg, currMem);
+            mainFile << "if (R[0]) {\n";
+            generate(node->right, tab, currReg, currMem);
+            mainFile << "} else {\n";
+            mainFile << "}\n";
+        } else if (strcmp(node->action, "WhileLoop") == 0) {
+            int loopLabel = currMem++;
+            mainFile << "L" << loopLabel << ":\n";
+            generate(node->left, tab, currReg, currMem);
+            mainFile << "if (!R[0]) goto L" << currMem << ";\n";
+            generate(node->right, tab, currReg, currMem);
+            mainFile << "goto L" << loopLabel << ";\n";
+            mainFile << "L" << currMem << ":\n";
         }
+
         generate(node->left, tab, currReg, currMem);
         generate(node->right, tab, currReg, currMem);
     }
 }
+
 
 int yywrap() {
     return 1;
