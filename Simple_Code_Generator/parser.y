@@ -277,19 +277,19 @@ void generate(parseTree *node, struct symtab *tab, int currReg, int currMem) {
             mainFile << "SR -= 1;\n";
         }
         else if(strcmp(node->action, "var_assign")) {
-            struct symtab *sp = symlook(node->name); 
+            struct symtab *sp = symlook(node->name);
             if(currReg > 2) {
                 currReg = 0;
             }
-            char* mem = strdup("Mem[SR+");
+            char* mem = strdup("Mem[SR-");
             char* reg = strdup("R[");
-            char* currRegStr;
-            char* currMemStr;
+            char currRegStr[9];
+            char currMemStr[9];
             snprintf(currRegStr, 9, "%d", currReg);
             snprintf(currMemStr, 9, "%d", currMem);
 
-            mainFile << reg << currRegStr << "]\n";
-            mainFile << mem << currMemStr << "]\n";
+            mainFile << reg << currRegStr << "] = " << sp->value << ";\n";
+            mainFile << mem << currMemStr << "] = " << sp->value << ";\n";
 
             strcat(mem, currRegStr);
             strcat(mem, "]");
