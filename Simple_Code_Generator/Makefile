@@ -10,7 +10,7 @@ FLEX=flex
 YACC=bison
 RUN=./
 RM=/bin/rm -f
-FILE=mg.f23
+FILE=test.f23
 
 # Don't need to check for clean
 .PHONY: clean, run, yourmain.h

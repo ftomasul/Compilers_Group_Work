@@ -1,0 +1,9 @@
+program test
+{
+    function integer main()
+    {
+        integer i;
+
+        i := 2;
+    }
+}
